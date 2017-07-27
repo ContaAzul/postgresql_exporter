@@ -58,6 +58,7 @@ func main() {
 		prometheus.MustRegister(gauges.WaitingBackends(db, labels, version))
 		prometheus.MustRegister(gauges.UnusedIndexes(db, labels))
 		prometheus.MustRegister(gauges.Locks(db, labels))
+		prometheus.MustRegister(gauges.ReplicationStatus(db, labels))
 		prometheus.MustRegister(gauges.ReplicationLag(db, labels))
 		prometheus.MustRegister(gauges.Deadlocks(db, labels))
 	}
