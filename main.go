@@ -34,7 +34,7 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.WithError(err).Fatal("failed to ping the database")
 		}
-		db.SetMaxOpenConns(1)
+		db.SetMaxOpenConns(5)
 		defer db.Close()
 
 		var version = pgVersion(db)
