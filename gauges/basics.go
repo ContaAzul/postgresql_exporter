@@ -24,17 +24,14 @@ func Up(db *sql.DB, labels prometheus.Labels, version string) prometheus.GaugeFu
 }
 
 func Size(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newConvertedGauge(
+	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_size_mb",
-			Help:        "Dabatase size in mbs",
+			Name:        "postgresql_size_bytes",
+			Help:        "Dabatase size in bytes",
 			ConstLabels: labels,
 		},
 		"SELECT pg_database_size(current_database())",
-		func(result float64) float64 {
-			return result / (1024 * 1024)
-		},
 	)
 }
 

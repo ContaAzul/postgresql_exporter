@@ -10,24 +10,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var nothing = func(i float64) float64 {
-	return i
-}
-
 func newGauge(
 	db *sql.DB,
 	opts prometheus.GaugeOpts,
 	query string,
-	params ...string,
-) prometheus.GaugeFunc {
-	return newConvertedGauge(db, opts, query, nothing, params...)
-}
-
-func newConvertedGauge(
-	db *sql.DB,
-	opts prometheus.GaugeOpts,
-	query string,
-	converter func(float64) float64,
 	params ...string,
 ) prometheus.GaugeFunc {
 	iparams := make([]interface{}, len(params))
