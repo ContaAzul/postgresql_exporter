@@ -8,6 +8,7 @@ import (
 
 	"github.com/apex/httplog"
 	"github.com/apex/log"
+	"github.com/apex/log/handlers/logfmt"
 	"github.com/caarlos0/postgresql_exporter/config"
 	"github.com/caarlos0/postgresql_exporter/gauges"
 	_ "github.com/lib/pq"
@@ -21,10 +22,9 @@ var (
 )
 
 func main() {
+	log.SetHandler(logfmt.Default)
 	flag.Parse()
-
 	var config = config.Parse(*configFile)
-
 	for _, con := range config.Databases {
 		db, err := sql.Open("postgres", con.URL)
 		if err != nil {
