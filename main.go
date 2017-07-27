@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/apex/httplog"
@@ -33,8 +34,13 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.WithError(err).Fatal("failed to ping the database")
 		}
+		db.SetMaxOpenConns(1)
+		defer db.Close()
+
+		var version = pgVersion(db)
 		var labels = prometheus.Labels{
-			"database_name": con.Name,
+			"database_name":    con.Name,
+			"postgres_version": version,
 		}
 
 		prometheus.MustRegister(gauges.Up(db, labels))
@@ -45,7 +51,7 @@ func main() {
 			prometheus.MustRegister(collector)
 		}
 		prometheus.MustRegister(gauges.MaxBackends(db, labels))
-		prometheus.MustRegister(gauges.WaitingBackends(db, labels))
+		prometheus.MustRegister(gauges.WaitingBackends(db, labels, version))
 		prometheus.MustRegister(gauges.UnusedIndexes(db, labels))
 		prometheus.MustRegister(gauges.Locks(db, labels))
 		prometheus.MustRegister(gauges.ReplicationLag(db, labels))
@@ -65,4 +71,14 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.WithError(err).Fatal("failed to start up server")
 	}
+}
+
+var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
+
+func pgVersion(db *sql.DB) string {
+	var version string
+	if err := db.QueryRow("select version()").Scan(&version); err != nil {
+		log.WithError(err).Fatal("failed to get postgresql version")
+	}
+	return versionRE.FindStringSubmatch(version)[1]
 }

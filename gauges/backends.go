@@ -2,6 +2,7 @@ package gauges
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
@@ -87,7 +88,7 @@ func countBackendsByState(db *sql.DB, opts prometheus.GaugeOpts, state string) f
 	}
 }
 
-func WaitingBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
+func WaitingBackends(db *sql.DB, labels prometheus.Labels, version string) prometheus.GaugeFunc {
 	var opts = prometheus.GaugeOpts{
 		Name:        "postgresql_db_waiting_backends",
 		Help:        "Database connections waiting on a Lock",
@@ -97,16 +98,28 @@ func WaitingBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc 
 		opts,
 		func() float64 {
 			var result float64
-			// TODO: this doesnt work on pg 9.6+
-			if err := db.QueryRow(`
+			var query = `
 				SELECT COUNT(*)
 				FROM pg_stat_activity
 				WHERE datname = current_database()
 				AND waiting is true
-			`).Scan(&result); err != nil {
+			`
+			if isPG96(version) {
+				query = `
+					SELECT COUNT(*)
+					FROM pg_stat_activity
+					WHERE datname = current_database()
+					AND wait_event is not null
+				`
+			}
+			if err := db.QueryRow(query).Scan(&result); err != nil {
 				log.WithError(err).Warnf("%s: failed to query metric", opts.Name)
 			}
 			return result
 		},
 	)
+}
+
+func isPG96(version string) bool {
+	return strings.HasPrefix(version, "9.6.")
 }
