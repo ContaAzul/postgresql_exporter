@@ -6,13 +6,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func Up(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
+func Up(db *sql.DB, labels prometheus.Labels, version string) prometheus.GaugeFunc {
+	lbl := prometheus.Labels{}
+	for k, v := range labels {
+		lbl[k] = v
+	}
+	lbl["version"] = version
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
 			Name:        "postgresql_up",
 			Help:        "Dabatase is up and accepting connections",
-			ConstLabels: labels,
+			ConstLabels: lbl,
 		},
 		"SELECT 1",
 	)

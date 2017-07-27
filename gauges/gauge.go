@@ -1,8 +1,10 @@
 package gauges
 
 import (
+	"context"
 	"database/sql"
 	"strings"
+	"time"
 
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
@@ -35,14 +37,17 @@ func newConvertedGauge(
 	return prometheus.NewGaugeFunc(
 		opts,
 		func() (result float64) {
-			tx, err := db.Begin()
-			if err != nil {
-				return -1
-			}
-			defer tx.Commit()
-			if err := tx.QueryRow(query, iparams...).Scan(&result); err != nil {
+			ctx, cancel := context.WithDeadline(
+				context.Background(),
+				time.Now().Add(1*time.Second),
+			)
+			defer func() {
+				<-ctx.Done()
+			}()
+			if err := db.QueryRowContext(ctx, query, iparams...).Scan(&result); err != nil {
 				log.WithError(err).Warnf("%s: failed to query metric", opts.Name)
 			}
+			cancel()
 			return
 		},
 	)

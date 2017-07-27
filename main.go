@@ -34,16 +34,15 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.WithError(err).Fatal("failed to ping the database")
 		}
-		db.SetMaxOpenConns(5)
+		db.SetMaxOpenConns(1)
 		defer db.Close()
 
 		var version = pgVersion(db)
 		var labels = prometheus.Labels{
-			"database_name":    con.Name,
-			"postgres_version": version,
+			"database_name": con.Name,
 		}
 
-		prometheus.MustRegister(gauges.Up(db, labels))
+		prometheus.MustRegister(gauges.Up(db, labels, version))
 		prometheus.MustRegister(gauges.Size(db, labels))
 		prometheus.MustRegister(gauges.IdleSessions(db, labels))
 		prometheus.MustRegister(gauges.Backends(db, labels))
