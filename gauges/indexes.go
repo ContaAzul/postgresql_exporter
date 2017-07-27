@@ -10,7 +10,7 @@ func UnusedIndexes(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_unused_indexes",
+			Name:        "postgresql_unused_indexes",
 			Help:        "Dabatase unused indexes count",
 			ConstLabels: labels,
 		},

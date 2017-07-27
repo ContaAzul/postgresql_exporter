@@ -10,7 +10,7 @@ func ReplicationLag(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_replication_lag",
+			Name:        "postgresql_replication_lag",
 			Help:        "Dabatase replication lag",
 			ConstLabels: labels,
 		},

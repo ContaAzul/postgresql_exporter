@@ -32,6 +32,7 @@ func main() {
 	var config = config.Parse(*configFile)
 	for _, con := range config.Databases {
 		db, err := sql.Open("postgres", con.URL)
+		var log = log.WithField("db", con.Name)
 		if err != nil {
 			log.WithError(err).Fatal("failed to connect to the database")
 		}

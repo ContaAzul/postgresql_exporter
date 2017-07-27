@@ -10,7 +10,7 @@ func IdleSessions(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_idle_sessions",
+			Name:        "postgresql_idle_sessions",
 			Help:        "Dabatase idle sessions",
 			ConstLabels: labels,
 		},

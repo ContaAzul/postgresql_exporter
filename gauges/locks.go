@@ -10,7 +10,7 @@ func Locks(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_locks",
+			Name:        "postgresql_locks",
 			Help:        "Dabatase lock count",
 			ConstLabels: labels,
 		},

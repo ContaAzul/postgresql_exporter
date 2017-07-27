@@ -10,7 +10,7 @@ func Backends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_numbackends",
+			Name:        "postgresql_totalbackends",
 			Help:        "Total database backends",
 			ConstLabels: labels,
 		},
@@ -26,7 +26,7 @@ func MaxBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_max_backends",
+			Name:        "postgresql_max_backends",
 			Help:        "Maximum database backends (per postmaster)",
 			ConstLabels: labels,
 		},
@@ -49,7 +49,7 @@ func BackendsStatus(db *sql.DB, labels prometheus.Labels) []prometheus.GaugeFunc
 		result = append(result, newGauge(
 			db,
 			prometheus.GaugeOpts{
-				Name:        "postgresql_db_backends",
+				Name:        "postgresql_backends",
 				Help:        "Active database connections",
 				ConstLabels: lbl,
 			},
@@ -83,7 +83,7 @@ func WaitingBackends(db *sql.DB, labels prometheus.Labels, version string) prome
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_waiting_backends",
+			Name:        "postgresql_waiting_backends",
 			Help:        "Database connections waiting on a Lock",
 			ConstLabels: labels,
 		},

@@ -27,7 +27,7 @@ func Size(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newConvertedGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_db_size_mb",
+			Name:        "postgresql_size_mb",
 			Help:        "Dabatase size in mbs",
 			ConstLabels: labels,
 		},
@@ -42,7 +42,7 @@ func Deadlocks(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{
-			Name:        "postgresql_deadlock",
+			Name:        "postgresql_deadlocks",
 			Help:        "Number of deadlocks in the last 2m",
 			ConstLabels: labels,
 		},
