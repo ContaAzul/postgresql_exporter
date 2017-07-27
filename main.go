@@ -9,7 +9,7 @@ import (
 
 	"github.com/apex/httplog"
 	"github.com/apex/log"
-	"github.com/apex/log/handlers/logfmt"
+	"github.com/apex/log/handlers/text"
 	"github.com/caarlos0/postgresql_exporter/config"
 	"github.com/caarlos0/postgresql_exporter/gauges"
 	_ "github.com/lib/pq"
@@ -20,10 +20,14 @@ import (
 var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
+	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
 
 func main() {
-	log.SetHandler(logfmt.Default)
+	log.SetHandler(text.Default)
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	}
 	flag.Parse()
 	var config = config.Parse(*configFile)
 	for _, con := range config.Databases {
@@ -60,10 +64,12 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 
 	var server = &http.Server{
-		Handler:      httplog.New(http.DefaultServeMux),
 		Addr:         *addr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
+	}
+	if *debug {
+		server.Handler = httplog.New(http.DefaultServeMux)
 	}
 
 	log.WithField("addr", *addr).Info("started")

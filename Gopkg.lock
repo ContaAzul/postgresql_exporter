@@ -10,7 +10,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/apex/log"
-  packages = [".","handlers/logfmt"]
+  packages = [".","handlers/text"]
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
 
 [[projects]]
@@ -20,22 +20,10 @@
   revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
 
 [[projects]]
-  name = "github.com/go-logfmt/logfmt"
-  packages = ["."]
-  revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
-  version = "v0.3.0"
-
-[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   revision = "748d386b5c1ea99658fd69fe9f03991ce86a90c1"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kr/logfmt"
-  packages = ["."]
-  revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
   branch = "master"
@@ -88,6 +76,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c15957671dd78adbd25a864b889f6d73ac6df0afa9434447d4248eca9a82d3f8"
+  inputs-digest = "71b21021e6ba5b9df94072b7ae0ec706d8f071beedae242c8aac9a271c92c9e6"
   solver-name = "gps-cdcl"
   solver-version = 1
