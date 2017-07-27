@@ -2,4 +2,4 @@ databases:
 - name: dba
   url: postgres://localhost:5432/dba?sslmode=disable
 - name: dbb
-  url: postgres://user@pwdlocalhost:5432/dbb?sslmode=disable
+  url: postgres://user:pwd@mydb.foo.bar:5432/dbb
