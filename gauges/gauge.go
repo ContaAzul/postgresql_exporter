@@ -32,6 +32,7 @@ func newGauge(
 			}()
 			if err := db.QueryRowContext(ctx, query, iparams...).Scan(&result); err != nil {
 				log.WithError(err).Warnf("%s: failed to query metric", opts.Name)
+				result = -1
 			}
 			cancel()
 			return
