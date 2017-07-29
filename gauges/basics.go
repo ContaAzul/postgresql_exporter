@@ -6,12 +6,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func Up(db *sql.DB, labels prometheus.Labels, version string) prometheus.GaugeFunc {
+func Up(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	lbl := prometheus.Labels{}
 	for k, v := range labels {
 		lbl[k] = v
 	}
-	lbl["version"] = version
+	lbl["version"] = pgVersion(db)
 	return newGauge(
 		db,
 		prometheus.GaugeOpts{

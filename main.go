@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"flag"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/apex/httplog"
@@ -42,25 +41,7 @@ func main() {
 		db.SetMaxOpenConns(1)
 		defer db.Close()
 
-		var version = pgVersion(db)
-		var labels = prometheus.Labels{
-			"database_name": con.Name,
-		}
-
-		prometheus.MustRegister(gauges.Up(db, labels, version))
-		prometheus.MustRegister(gauges.Size(db, labels))
-		prometheus.MustRegister(gauges.IdleSessions(db, labels))
-		prometheus.MustRegister(gauges.Backends(db, labels))
-		for _, collector := range gauges.BackendsStatus(db, labels) {
-			prometheus.MustRegister(collector)
-		}
-		prometheus.MustRegister(gauges.MaxBackends(db, labels))
-		prometheus.MustRegister(gauges.WaitingBackends(db, labels, version))
-		prometheus.MustRegister(gauges.UnusedIndexes(db, labels))
-		prometheus.MustRegister(gauges.Locks(db, labels))
-		prometheus.MustRegister(gauges.ReplicationStatus(db, labels))
-		prometheus.MustRegister(gauges.ReplicationLag(db, labels))
-		prometheus.MustRegister(gauges.Deadlocks(db, labels))
+		watch(db, prometheus.DefaultRegisterer, con.Name)
 	}
 
 	http.Handle("/metrics", promhttp.Handler())
@@ -80,12 +61,22 @@ func main() {
 	}
 }
 
-var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
-
-func pgVersion(db *sql.DB) string {
-	var version string
-	if err := db.QueryRow("select version()").Scan(&version); err != nil {
-		log.WithError(err).Fatal("failed to get postgresql version")
+func watch(db *sql.DB, reg prometheus.Registerer, name string) {
+	var labels = prometheus.Labels{
+		"database_name": name,
 	}
-	return versionRE.FindStringSubmatch(version)[1]
+	reg.MustRegister(gauges.Up(db, labels))
+	reg.MustRegister(gauges.Size(db, labels))
+	reg.MustRegister(gauges.IdleSessions(db, labels))
+	reg.MustRegister(gauges.Backends(db, labels))
+	for _, collector := range gauges.BackendsStatus(db, labels) {
+		reg.MustRegister(collector)
+	}
+	reg.MustRegister(gauges.MaxBackends(db, labels))
+	reg.MustRegister(gauges.WaitingBackends(db, labels))
+	reg.MustRegister(gauges.UnusedIndexes(db, labels))
+	reg.MustRegister(gauges.Locks(db, labels))
+	reg.MustRegister(gauges.ReplicationStatus(db, labels))
+	reg.MustRegister(gauges.ReplicationLag(db, labels))
+	reg.MustRegister(gauges.Deadlocks(db, labels))
 }

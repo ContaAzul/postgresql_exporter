@@ -65,14 +65,14 @@ func BackendsStatus(db *sql.DB, labels prometheus.Labels) []prometheus.GaugeFunc
 	return result
 }
 
-func WaitingBackends(db *sql.DB, labels prometheus.Labels, version string) prometheus.GaugeFunc {
+func WaitingBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	var query = `
 		SELECT COUNT(*)
 		FROM pg_stat_activity
 		WHERE datname = current_database()
 		AND waiting is true
 	`
-	if isPG96(version) {
+	if isPG96(pgVersion(db)) {
 		query = `
 			SELECT COUNT(*)
 			FROM pg_stat_activity

@@ -28,7 +28,7 @@ func TestWaitingBackends(t *testing.T) {
 	var assert = assert.New(t)
 	var db = connect(t)
 	defer db.Close()
-	var metrics = evaluate(t, WaitingBackends(db, labels, "9.6.1"))
+	var metrics = evaluate(t, WaitingBackends(db, labels))
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 }
