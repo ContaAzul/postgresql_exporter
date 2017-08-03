@@ -19,6 +19,7 @@ import (
 var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
+	interval   = flag.Duration("interval", 20*time.Second, "interval between gathering metrics")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
 
@@ -52,6 +53,7 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 	if *debug {
+		log.SetLevel(log.DebugLevel)
 		server.Handler = httplog.New(http.DefaultServeMux)
 	}
 

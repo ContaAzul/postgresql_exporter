@@ -16,14 +16,17 @@ func newGauge(
 	opts prometheus.GaugeOpts,
 	query string,
 	params ...string,
-) prometheus.GaugeFunc {
+) prometheus.Gauge {
 	iparams := make([]interface{}, len(params))
 	for i, v := range params {
 		iparams[i] = v
 	}
-	return prometheus.NewGaugeFunc(
-		opts,
-		func() (result float64) {
+	var gauge = prometheus.NewGauge(opts)
+	go func() {
+		for {
+			var log = log.WithField("metric", opts.Name)
+			log.Debugf("collecting")
+			var result float64
 			ctx, cancel := context.WithDeadline(
 				context.Background(),
 				time.Now().Add(1*time.Second),
@@ -32,13 +35,14 @@ func newGauge(
 				<-ctx.Done()
 			}()
 			if err := db.QueryRowContext(ctx, query, iparams...).Scan(&result); err != nil {
-				log.WithError(err).Warnf("%s: failed to query metric", opts.Name)
-				result = -1000
+				log.WithError(err).Warn("failed to query metric")
 			}
 			cancel()
-			return
-		},
-	)
+			gauge.Set(result)
+			time.Sleep(20 * time.Second)
+		}
+	}()
+	return gauge
 }
 
 func isPG96(version string) bool {
