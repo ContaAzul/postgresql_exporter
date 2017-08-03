@@ -1,19 +1,14 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func Up(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
+func (g *Gauges) Up() prometheus.Gauge {
 	lbl := prometheus.Labels{}
-	for k, v := range labels {
+	for k, v := range g.labels {
 		lbl[k] = v
 	}
-	lbl["version"] = pgVersion(db)
-	return newGauge(
-		db,
+	lbl["version"] = g.version()
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_up",
 			Help:        "Dabatase is up and accepting connections",
@@ -23,25 +18,23 @@ func Up(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	)
 }
 
-func Size(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) Size() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_size_bytes",
 			Help:        "Dabatase size in bytes",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		"SELECT pg_database_size(current_database())",
 	)
 }
 
-func Deadlocks(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) Deadlocks() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_deadlocks",
 			Help:        "Number of deadlocks in the last 2m",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT count(*) FROM pg_locks bl

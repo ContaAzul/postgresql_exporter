@@ -11,8 +11,25 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func newGauge(
-	db *sql.DB,
+type Gauges struct {
+	name     string
+	db       *sql.DB
+	interval time.Duration
+	labels   prometheus.Labels
+}
+
+func New(name string, db *sql.DB, interval time.Duration) *Gauges {
+	return &Gauges{
+		name:     name,
+		db:       db,
+		interval: interval,
+		labels: prometheus.Labels{
+			"database_name": name,
+		},
+	}
+}
+
+func (g *Gauges) new(
 	opts prometheus.GaugeOpts,
 	query string,
 	params ...string,
@@ -22,39 +39,44 @@ func newGauge(
 		iparams[i] = v
 	}
 	var gauge = prometheus.NewGauge(opts)
-	go func() {
-		for {
-			var log = log.WithField("metric", opts.Name)
-			log.Debugf("collecting")
-			var result float64
-			ctx, cancel := context.WithDeadline(
-				context.Background(),
-				time.Now().Add(1*time.Second),
-			)
-			defer func() {
-				<-ctx.Done()
-			}()
-			if err := db.QueryRowContext(ctx, query, iparams...).Scan(&result); err != nil {
-				log.WithError(err).Warn("failed to query metric")
-			}
-			cancel()
-			gauge.Set(result)
-			time.Sleep(20 * time.Second)
-		}
-	}()
+	go g.observe(gauge, opts.Name, query, iparams)
 	return gauge
 }
 
-func isPG96(version string) bool {
-	return strings.HasPrefix(version, "9.6.")
+func (g *Gauges) observe(gauge prometheus.Gauge, metric, query string, params []interface{}) {
+	for {
+		var result float64
+		var log = log.WithField("db", g.name).WithField("metric", metric)
+		log.Debugf("collecting")
+		ctx, cancel := context.WithDeadline(
+			context.Background(),
+			time.Now().Add(1*time.Second),
+		)
+		defer func() {
+			<-ctx.Done()
+		}()
+		var err = g.db.QueryRowContext(ctx, query, params...).Scan(&result)
+		if err != nil {
+			log.WithError(err).Warn("failed to query metric")
+		}
+		cancel()
+		if err == nil {
+			gauge.Set(result)
+		}
+		time.Sleep(g.interval)
+	}
 }
 
 var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
 
-func pgVersion(db *sql.DB) string {
+func (g *Gauges) version() string {
 	var version string
-	if err := db.QueryRow("select version()").Scan(&version); err != nil {
+	if err := g.db.QueryRow("select version()").Scan(&version); err != nil {
 		log.WithError(err).Fatal("failed to get postgresql version")
 	}
 	return versionRE.FindStringSubmatch(version)[1]
+}
+
+func isPG96(version string) bool {
+	return strings.HasPrefix(version, "9.6.")
 }

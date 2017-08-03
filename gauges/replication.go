@@ -1,18 +1,13 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func ReplicationStatus(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) ReplicationStatus() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_replication_status",
 			Help:        "Returns 1 if in recovery and replay is paused. Otherwise returns 0",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT
@@ -31,13 +26,12 @@ func ReplicationStatus(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFun
 	)
 }
 
-func ReplicationLag(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) ReplicationLag() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_replication_lag",
 			Help:        "Dabatase replication lag",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT COALESCE(

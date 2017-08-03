@@ -8,9 +8,9 @@ import (
 
 func TestLocks(t *testing.T) {
 	var assert = assert.New(t)
-	var db = connect(t)
-	defer db.Close()
-	var metrics = evaluate(t, Locks(db, labels))
+	gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.Locks())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 }

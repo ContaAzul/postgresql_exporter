@@ -1,18 +1,13 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func Backends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) Backends() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_totalbackends",
 			Help:        "Total database backends",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT numbackends
@@ -22,13 +17,12 @@ func Backends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	)
 }
 
-func MaxBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) MaxBackends() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_max_backends",
 			Help:        "Maximum database backends (per postmaster)",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT setting::numeric
@@ -38,16 +32,15 @@ func MaxBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
 	)
 }
 
-func BackendsStatus(db *sql.DB, labels prometheus.Labels) []prometheus.GaugeFunc {
-	var result = []prometheus.GaugeFunc{}
+func (g *Gauges) BackendsStatus() []prometheus.Gauge {
+	var result = []prometheus.Gauge{}
 	for _, status := range []string{"active", "idle", "idle in transaction"} {
 		lbl := prometheus.Labels{}
-		for k, v := range labels {
+		for k, v := range g.labels {
 			lbl[k] = v
 		}
 		lbl["status"] = status
-		result = append(result, newGauge(
-			db,
+		result = append(result, g.new(
 			prometheus.GaugeOpts{
 				Name:        "postgresql_backends",
 				Help:        "Active database connections",
@@ -65,14 +58,14 @@ func BackendsStatus(db *sql.DB, labels prometheus.Labels) []prometheus.GaugeFunc
 	return result
 }
 
-func WaitingBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
+func (g *Gauges) WaitingBackends() prometheus.Gauge {
 	var query = `
 		SELECT COUNT(*)
 		FROM pg_stat_activity
 		WHERE datname = current_database()
 		AND waiting is true
 	`
-	if isPG96(pgVersion(db)) {
+	if isPG96(g.version()) {
 		query = `
 			SELECT COUNT(*)
 			FROM pg_stat_activity
@@ -80,12 +73,11 @@ func WaitingBackends(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc 
 			AND wait_event is not null
 		`
 	}
-	return newGauge(
-		db,
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_waiting_backends",
 			Help:        "Database connections waiting on a Lock",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		query,
 	)

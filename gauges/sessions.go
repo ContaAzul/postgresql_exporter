@@ -1,18 +1,13 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func IdleSessions(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) IdleSessions() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_idle_sessions",
 			Help:        "Dabatase idle sessions",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT count(*)

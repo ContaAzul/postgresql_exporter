@@ -1,18 +1,13 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func UnusedIndexes(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) UnusedIndexes() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_unused_indexes",
 			Help:        "Dabatase unused indexes count",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT COUNT(*)

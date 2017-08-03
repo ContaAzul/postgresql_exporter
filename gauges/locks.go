@@ -1,18 +1,13 @@
 package gauges
 
-import (
-	"database/sql"
+import "github.com/prometheus/client_golang/prometheus"
 
-	"github.com/prometheus/client_golang/prometheus"
-)
-
-func Locks(db *sql.DB, labels prometheus.Labels) prometheus.GaugeFunc {
-	return newGauge(
-		db,
+func (g *Gauges) Locks() prometheus.Gauge {
+	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_locks",
 			Help:        "Dabatase lock count",
-			ConstLabels: labels,
+			ConstLabels: g.labels,
 		},
 		`
 			SELECT count(*)

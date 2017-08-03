@@ -20,6 +20,7 @@ var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
 	interval   = flag.Duration("interval", 20*time.Second, "interval between gathering metrics")
+	maxDBConns = flag.Int("max-connections", 1, "max connections to open to each database")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
 
@@ -39,7 +40,7 @@ func main() {
 		if err := db.Ping(); err != nil {
 			log.WithError(err).Fatal("failed to ping the database")
 		}
-		db.SetMaxOpenConns(1)
+		db.SetMaxOpenConns(*maxDBConns)
 		defer db.Close()
 
 		watch(db, prometheus.DefaultRegisterer, con.Name)
@@ -64,21 +65,19 @@ func main() {
 }
 
 func watch(db *sql.DB, reg prometheus.Registerer, name string) {
-	var labels = prometheus.Labels{
-		"database_name": name,
-	}
-	reg.MustRegister(gauges.Up(db, labels))
-	reg.MustRegister(gauges.Size(db, labels))
-	reg.MustRegister(gauges.IdleSessions(db, labels))
-	reg.MustRegister(gauges.Backends(db, labels))
-	for _, collector := range gauges.BackendsStatus(db, labels) {
+	var gauges = gauges.New(name, db, *interval)
+	reg.MustRegister(gauges.Up())
+	reg.MustRegister(gauges.Size())
+	reg.MustRegister(gauges.IdleSessions())
+	reg.MustRegister(gauges.Backends())
+	for _, collector := range gauges.BackendsStatus() {
 		reg.MustRegister(collector)
 	}
-	reg.MustRegister(gauges.MaxBackends(db, labels))
-	reg.MustRegister(gauges.WaitingBackends(db, labels))
-	reg.MustRegister(gauges.UnusedIndexes(db, labels))
-	reg.MustRegister(gauges.Locks(db, labels))
-	reg.MustRegister(gauges.ReplicationStatus(db, labels))
-	reg.MustRegister(gauges.ReplicationLag(db, labels))
-	reg.MustRegister(gauges.Deadlocks(db, labels))
+	reg.MustRegister(gauges.MaxBackends())
+	reg.MustRegister(gauges.WaitingBackends())
+	reg.MustRegister(gauges.UnusedIndexes())
+	reg.MustRegister(gauges.Locks())
+	reg.MustRegister(gauges.ReplicationStatus())
+	reg.MustRegister(gauges.ReplicationLag())
+	reg.MustRegister(gauges.Deadlocks())
 }
