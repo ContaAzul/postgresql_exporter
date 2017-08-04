@@ -20,20 +20,28 @@ var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
 	interval   = flag.Duration("interval", 20*time.Second, "interval between gathering metrics")
-	maxDBConns = flag.Int("max-connections", 1, "max connections to open to each database")
+	maxDBConns = flag.Int("max-db-connections", 1, "max connections to open to each database")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
 
 func main() {
 	log.SetHandler(text.Default)
+	flag.Parse()
+	var server = &http.Server{
+		Addr:         *addr,
+		WriteTimeout: 1 * time.Second,
+		ReadTimeout:  1 * time.Second,
+	}
 	if *debug {
 		log.SetLevel(log.DebugLevel)
+		server.Handler = httplog.New(http.DefaultServeMux)
 	}
-	flag.Parse()
+	http.Handle("/metrics", promhttp.Handler())
 	var config = config.Parse(*configFile)
 	for _, con := range config.Databases {
-		db, err := sql.Open("postgres", con.URL)
 		var log = log.WithField("db", con.Name)
+		log.Info("started monitoring")
+		db, err := sql.Open("postgres", con.URL)
 		if err != nil {
 			log.WithError(err).Fatal("failed to connect to the database")
 		}
@@ -45,19 +53,6 @@ func main() {
 
 		watch(db, prometheus.DefaultRegisterer, con.Name)
 	}
-
-	http.Handle("/metrics", promhttp.Handler())
-
-	var server = &http.Server{
-		Addr:         *addr,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-	if *debug {
-		log.SetLevel(log.DebugLevel)
-		server.Handler = httplog.New(http.DefaultServeMux)
-	}
-
 	log.WithField("addr", *addr).Info("started")
 	if err := server.ListenAndServe(); err != nil {
 		log.WithError(err).Fatal("failed to start up server")
