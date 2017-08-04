@@ -72,7 +72,8 @@ var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
 func (g *Gauges) version() string {
 	var version string
 	if err := g.db.QueryRow("select version()").Scan(&version); err != nil {
-		log.WithError(err).Fatal("failed to get postgresql version")
+		log.WithError(err).Error("failed to get postgresql version, assuming 9.6.0")
+		return "9.6.0"
 	}
 	return versionRE.FindStringSubmatch(version)[1]
 }
