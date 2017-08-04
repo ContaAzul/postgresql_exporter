@@ -43,10 +43,10 @@ func main() {
 		log.Info("started monitoring")
 		db, err := sql.Open("postgres", con.URL)
 		if err != nil {
-			log.WithError(err).Fatal("failed to connect to the database")
+			log.WithError(err).Error("failed to open url")
 		}
 		if err := db.Ping(); err != nil {
-			log.WithError(err).Fatal("failed to ping the database")
+			log.WithError(err).Error("failed to ping database")
 		}
 		db.SetMaxOpenConns(*maxDBConns)
 		defer db.Close()
