@@ -29,6 +29,17 @@ func (g *Gauges) Size() prometheus.Gauge {
 	)
 }
 
+func (g *Gauges) TempSize() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_temp_bytes",
+			Help:        "Temp size in bytes",
+			ConstLabels: g.labels,
+		},
+		"SELECT temp_bytes FROM pg_stat_database WHERE datname = current_database()",
+	)
+}
+
 func (g *Gauges) Deadlocks() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
