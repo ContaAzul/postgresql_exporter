@@ -32,3 +32,21 @@ func TestDeadlocks(t *testing.T) {
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 }
+
+func TestTempSize(t *testing.T) {
+	var assert = assert.New(t)
+	gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.TempSize())
+	assert.Len(metrics, 1)
+	assertGreaterThan(t, -1, metrics[0])
+}
+
+func TestTempFiles(t *testing.T) {
+	var assert = assert.New(t)
+	gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.TempFiles())
+	assert.Len(metrics, 1)
+	assertGreaterThan(t, -1, metrics[0])
+}

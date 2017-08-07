@@ -27,7 +27,7 @@ func evaluate(t *testing.T, gauges ...prometheus.Gauge) (result []Metric) {
 	for _, gauge := range gauges {
 		assert.NoError(reg.Register(gauge))
 	}
-	time.Sleep(1 * time.Second)
+	time.Sleep(100 * time.Millisecond)
 	metrics, err := reg.Gather()
 	assert.NoError(err)
 	for _, metric := range metrics {
