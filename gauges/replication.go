@@ -26,6 +26,21 @@ func (g *Gauges) ReplicationStatus() prometheus.Gauge {
 	)
 }
 
+func (g *Gauges) StreamingWALs() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_streaming_wals",
+			Help:        "Returns the count of WALs in streaming state",
+			ConstLabels: g.labels,
+		},
+		`
+			SELECT count(state)
+			FROM pg_stat_replication
+			WHERE state='streaming'
+		`,
+	)
+}
+
 func (g *Gauges) ReplicationLag() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
