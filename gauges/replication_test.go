@@ -23,3 +23,12 @@ func TestReplicationLag(t *testing.T) {
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 }
+
+func TestStreamingWALs(t *testing.T) {
+	var assert = assert.New(t)
+	gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.StreamingWALs())
+	assert.Len(metrics, 1)
+	assertGreaterThan(t, -1, metrics[0])
+}

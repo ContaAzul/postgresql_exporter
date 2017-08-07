@@ -51,6 +51,7 @@ func (g *Gauges) BackendsStatus() []prometheus.Gauge {
 				FROM pg_stat_activity
 				WHERE datname = current_database()
 				AND state = $1
+				AND pid <> pg_backend_pid()
 			`,
 			status,
 		))
