@@ -75,4 +75,8 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.ReplicationStatus())
 	reg.MustRegister(gauges.ReplicationLag())
 	reg.MustRegister(gauges.Deadlocks())
+	req.MustRegister(gauges.BufferOversize())
+	req.MustRegister(gauges.BuffersWritten())
+	req.MustRegister(gauges.RequestedCheckpoints())
+	req.MustRegister(gauges.ScheduledCheckpoints())
 }
