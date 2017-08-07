@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/config"
+	"github.com/ContaAzul/postgresql_exporter/gauges"
 	"github.com/apex/httplog"
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/text"
-	"github.com/caarlos0/postgresql_exporter/config"
-	"github.com/caarlos0/postgresql_exporter/gauges"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -75,8 +75,8 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.ReplicationStatus())
 	reg.MustRegister(gauges.ReplicationLag())
 	reg.MustRegister(gauges.Deadlocks())
-	req.MustRegister(gauges.BufferOversize())
-	req.MustRegister(gauges.BuffersWritten())
-	req.MustRegister(gauges.RequestedCheckpoints())
-	req.MustRegister(gauges.ScheduledCheckpoints())
+	reg.MustRegister(gauges.BufferOversize())
+	reg.MustRegister(gauges.BuffersWritten())
+	reg.MustRegister(gauges.RequestedCheckpoints())
+	reg.MustRegister(gauges.ScheduledCheckpoints())
 }

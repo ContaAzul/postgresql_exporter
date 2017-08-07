@@ -24,5 +24,5 @@ graph and alert on them.
 ## Running it within Docker
 
 ```console
-docker run -p 9111 -v /path/to/my/config.yml:/config.yml caarlos0/postgresql_exporter
+docker run -p 9111 -v /path/to/my/config.yml:/config.yml caninjas/postgresql_exporter
 ```
