@@ -18,3 +18,33 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 		`,
 	)
 }
+
+func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_index_blks_read_sum",
+			Help:        "Sum of the number of disk blocks read from all public indexes",
+			ConstLabels: g.labels,
+		},
+		`
+			SELECT coalesce(sum(idx_blks_read), 0)
+			FROM pg_statio_all_indexes
+			WHERE schemaname = 'public'
+		`,
+	)
+}
+
+func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_index_blks_hit_sum",
+			Help:        "Sum of the number of buffer hits on all public indexes",
+			ConstLabels: g.labels,
+		},
+		`
+			SELECT coalesce(sum(idx_blks_hit), 0)
+			FROM pg_statio_all_indexes
+			WHERE schemaname = 'public'
+		`,
+	)
+}
