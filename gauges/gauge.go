@@ -39,14 +39,26 @@ func (g *Gauges) new(
 		iparams[i] = v
 	}
 	var gauge = prometheus.NewGauge(opts)
-	go g.observe(gauge, opts.Name, query, iparams)
+	go g.observe(gauge, query, iparams)
 	return gauge
 }
 
-func (g *Gauges) observe(gauge prometheus.Gauge, metric, query string, params []interface{}) {
+func (g *Gauges) from(
+	gauge prometheus.Gauge,
+	query string,
+	params ...string,
+) {
+	iparams := make([]interface{}, len(params))
+	for i, v := range params {
+		iparams[i] = v
+	}
+	go g.observe(gauge, query, iparams)
+}
+
+func (g *Gauges) observe(gauge prometheus.Gauge, query string, params []interface{}) {
 	for {
 		var result float64
-		var log = log.WithField("db", g.name).WithField("metric", metric)
+		var log = log.WithField("db", g.name)
 		log.Debugf("collecting")
 		ctx, cancel := context.WithDeadline(
 			context.Background(),
@@ -57,7 +69,7 @@ func (g *Gauges) observe(gauge prometheus.Gauge, metric, query string, params []
 		}()
 		var err = g.db.QueryRowContext(ctx, query, params...).Scan(&result)
 		if err != nil {
-			log.WithError(err).Warn("failed to query metric")
+			log.WithError(err).Warnf("failed to query: %s", query)
 		}
 		cancel()
 		if err == nil {

@@ -32,20 +32,16 @@ func (g *Gauges) MaxBackends() prometheus.Gauge {
 	)
 }
 
-func (g *Gauges) BackendsStatus() []prometheus.Gauge {
-	var result = []prometheus.Gauge{}
+func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
+	var opts = prometheus.GaugeOpts{
+		Name:        "postgresql_backends",
+		Help:        "Active database connections",
+		ConstLabels: g.labels,
+	}
+	var gauge = prometheus.NewGaugeVec(opts, []string{"status"})
 	for _, status := range []string{"active", "idle", "idle in transaction"} {
-		lbl := prometheus.Labels{}
-		for k, v := range g.labels {
-			lbl[k] = v
-		}
-		lbl["status"] = status
-		result = append(result, g.new(
-			prometheus.GaugeOpts{
-				Name:        "postgresql_backends",
-				Help:        "Active database connections",
-				ConstLabels: lbl,
-			},
+		g.from(
+			gauge.With(prometheus.Labels{"status": status}),
 			`
 				SELECT COUNT(*)
 				FROM pg_stat_activity
@@ -54,9 +50,9 @@ func (g *Gauges) BackendsStatus() []prometheus.Gauge {
 				AND pid <> pg_backend_pid()
 			`,
 			status,
-		))
+		)
 	}
-	return result
+	return gauge
 }
 
 func (g *Gauges) WaitingBackends() prometheus.Gauge {
