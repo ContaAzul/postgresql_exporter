@@ -67,7 +67,6 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.Backends())
 	reg.MustRegister(gauges.BackendsStatus())
 	reg.MustRegister(gauges.MaxBackends())
-	reg.MustRegister(gauges.WaitingBackends())
 	reg.MustRegister(gauges.UnusedIndexes())
 	reg.MustRegister(gauges.Locks())
 	reg.MustRegister(gauges.ReplicationStatus())
