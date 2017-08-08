@@ -8,7 +8,7 @@ import (
 
 func TestUp(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.Up())
 	assert.Len(metrics, 1)
@@ -17,7 +17,7 @@ func TestUp(t *testing.T) {
 
 func TestSize(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.Size())
 	assert.Len(metrics, 1)
@@ -26,7 +26,7 @@ func TestSize(t *testing.T) {
 
 func TestDeadlocks(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.Deadlocks())
 	assert.Len(metrics, 1)
@@ -35,7 +35,7 @@ func TestDeadlocks(t *testing.T) {
 
 func TestTempSize(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.TempSize())
 	assert.Len(metrics, 1)
@@ -44,7 +44,7 @@ func TestTempSize(t *testing.T) {
 
 func TestTempFiles(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.TempFiles())
 	assert.Len(metrics, 1)
