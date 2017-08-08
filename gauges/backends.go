@@ -52,30 +52,26 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 			status,
 		)
 	}
+	g.from(
+		gauge.With(prometheus.Labels{"status": "waiting"}),
+		g.waitingBackendsQuery(),
+	)
 	return gauge
 }
 
-func (g *Gauges) WaitingBackends() prometheus.Gauge {
-	var query = `
-		SELECT COUNT(*)
-		FROM pg_stat_activity
-		WHERE datname = current_database()
-		AND waiting is true
-	`
+func (g *Gauges) waitingBackendsQuery() string {
 	if isPG96(g.version()) {
-		query = `
+		return `
 			SELECT COUNT(*)
 			FROM pg_stat_activity
 			WHERE datname = current_database()
 			AND wait_event is not null
 		`
 	}
-	return g.new(
-		prometheus.GaugeOpts{
-			Name:        "postgresql_waiting_backends",
-			Help:        "Database connections waiting on a Lock",
-			ConstLabels: g.labels,
-		},
-		query,
-	)
+	return `
+		SELECT COUNT(*)
+		FROM pg_stat_activity
+		WHERE datname = current_database()
+		AND waiting is true
+	`
 }
