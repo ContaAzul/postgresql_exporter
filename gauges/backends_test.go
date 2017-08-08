@@ -8,7 +8,7 @@ import (
 
 func TestBackends(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.Backends())
 	assert.Len(metrics, 1)
@@ -17,7 +17,7 @@ func TestBackends(t *testing.T) {
 
 func TestMaxBackends(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.MaxBackends())
 	assert.Len(metrics, 1)
@@ -26,7 +26,7 @@ func TestMaxBackends(t *testing.T) {
 
 func TestWaitingBackends(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.WaitingBackends())
 	assert.Len(metrics, 1)
@@ -35,9 +35,9 @@ func TestWaitingBackends(t *testing.T) {
 
 func TestBackendsStatus(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.BackendsStatus()...)
+	var metrics = evaluate(t, gauges.BackendsStatus())
 	assert.Len(metrics, 3)
 	for _, m := range metrics {
 		assertGreaterThan(t, -1, m)

@@ -8,7 +8,7 @@ import (
 
 func TestUnusedIndexes(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.UnusedIndexes())
 	assert.Len(metrics, 1)

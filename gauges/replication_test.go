@@ -8,7 +8,7 @@ import (
 
 func TestReplicationStatus(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.ReplicationStatus())
 	assert.Len(metrics, 1)
@@ -17,7 +17,7 @@ func TestReplicationStatus(t *testing.T) {
 
 func TestReplicationLag(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.ReplicationLag())
 	assert.Len(metrics, 1)
@@ -26,7 +26,7 @@ func TestReplicationLag(t *testing.T) {
 
 func TestStreamingWALs(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.StreamingWALs())
 	assert.Len(metrics, 1)

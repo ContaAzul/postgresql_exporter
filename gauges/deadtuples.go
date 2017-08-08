@@ -3,7 +3,6 @@ package gauges
 import (
 	"time"
 
-	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -11,7 +10,7 @@ type Relation struct {
 	Name string `db:"relname"`
 }
 
-func (g *Gauges) DeatTuples() *prometheus.GaugeVec {
+func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	var opts = prometheus.GaugeOpts{
 		Name:        "postgresql_dead_tuples_pct",
 		Help:        "dead tuples percentage on the top 20 biggest tables",
@@ -21,9 +20,8 @@ func (g *Gauges) DeatTuples() *prometheus.GaugeVec {
 
 	go func() {
 		for {
-			time.Sleep(g.interval)
 			var tables []Relation
-			if err := g.query(
+			g.query(
 				`
 					SELECT relname
 					FROM pg_stat_user_tables
@@ -31,10 +29,7 @@ func (g *Gauges) DeatTuples() *prometheus.GaugeVec {
 				`,
 				&tables,
 				emptyParams,
-			); err != nil {
-				log.WithError(err).Error("failed")
-				continue
-			}
+			)
 			for _, table := range tables {
 				g.fromOnce(
 					gauge.With(prometheus.Labels{"table": table.Name}),
@@ -42,6 +37,7 @@ func (g *Gauges) DeatTuples() *prometheus.GaugeVec {
 					table.Name,
 				)
 			}
+			time.Sleep(g.interval)
 		}
 	}()
 

@@ -8,7 +8,7 @@ import (
 
 func TestRequestedCheckpoints(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.RequestedCheckpoints())
 	assert.Len(metrics, 1)
@@ -17,7 +17,7 @@ func TestRequestedCheckpoints(t *testing.T) {
 
 func TestScheduledCheckpoints(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.ScheduledCheckpoints())
 	assert.Len(metrics, 1)
@@ -26,7 +26,7 @@ func TestScheduledCheckpoints(t *testing.T) {
 
 func TestBufferOversize(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.BufferOversize())
 	assert.Len(metrics, 1)
@@ -35,7 +35,7 @@ func TestBufferOversize(t *testing.T) {
 
 func TestBuffersWritten(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.BuffersWritten())
 	assert.Len(metrics, 1)

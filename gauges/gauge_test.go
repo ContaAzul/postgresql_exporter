@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/apex/log"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
@@ -21,12 +20,10 @@ var labels = prometheus.Labels{
 	"testing": "true",
 }
 
-func evaluate(t *testing.T, gauges ...prometheus.Gauge) (result []Metric) {
+func evaluate(t *testing.T, c prometheus.Collector) (result []Metric) {
 	var assert = assert.New(t)
 	var reg = prometheus.NewRegistry()
-	for _, gauge := range gauges {
-		assert.NoError(reg.Register(gauge))
-	}
+	assert.NoError(reg.Register(c))
 	time.Sleep(100 * time.Millisecond)
 	metrics, err := reg.Gather()
 	assert.NoError(err)
@@ -52,11 +49,10 @@ func assertGreaterThan(t *testing.T, expected float64, m Metric) {
 	)
 }
 
-func prepare(t *testing.T) (*Gauges, func()) {
+func prepare(t *testing.T) (*sql.DB, *Gauges, func()) {
 	var db = connect(t)
 	var gauges = New("test", db, 1*time.Minute)
-	return gauges, func() {
-		log.Info("CLOSING")
+	return db, gauges, func() {
 		assert.NoError(t, db.Close())
 	}
 }

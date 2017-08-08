@@ -8,7 +8,7 @@ import (
 
 func TestHeapBlocksRead(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.HeapBlocksRead())
 	assert.Len(metrics, 1)
@@ -17,7 +17,7 @@ func TestHeapBlocksRead(t *testing.T) {
 
 func TestHeapBlocksHit(t *testing.T) {
 	var assert = assert.New(t)
-	gauges, close := prepare(t)
+	_, gauges, close := prepare(t)
 	defer close()
 	var metrics = evaluate(t, gauges.HeapBlocksHit())
 	assert.Len(metrics, 1)
