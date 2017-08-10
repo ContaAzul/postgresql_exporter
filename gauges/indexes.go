@@ -161,23 +161,26 @@ type indexBloat struct {
 }
 
 func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
-	var opts = prometheus.GaugeOpts{
-		Name:        "index_bloat_pct",
-		Help:        "bloat percentage of an index. reports only for indexes > 10mb and > 50% bloat",
-		ConstLabels: g.labels,
-	}
-	var gauge = prometheus.NewGaugeVec(opts, []string{"index", "table"})
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_index_bloat_pct",
+			Help:        "bloat percentage of an index. reports only for indexes > 10mb and > 50% bloat",
+			ConstLabels: g.labels,
+		},
+		[]string{"index", "table"},
+	)
 	go func() {
 		for {
 			var indexes []indexBloat
-			g.query(indexBloatQuery, &indexes, emptyParams)
-			for _, idx := range indexes {
-				gauge.With(prometheus.Labels{
-					"table": idx.Table,
-					"index": idx.Name,
-				}).Set(idx.Pct)
+			if err := g.query(indexBloatQuery, &indexes, emptyParams); err == nil {
+				for _, idx := range indexes {
+					gauge.With(prometheus.Labels{
+						"table": idx.Table,
+						"index": idx.Name,
+					}).Set(idx.Pct)
+				}
+				time.Sleep(g.interval)
 			}
-			time.Sleep(g.interval)
 		}
 	}()
 	return gauge
