@@ -91,16 +91,12 @@ func (g *Gauges) query(query string, result interface{}, params []interface{}) e
 	}()
 	var err = g.db.SelectContext(ctx, result, query, params...)
 	if err != nil {
-		var q = cleanQuery(query)
+		var q = strings.Join(strings.Fields(query), " ")
 		g.Errs.With(prometheus.Labels{"query": q}).Inc()
 		log.WithError(err).WithField("query", q).Error("query failed")
 	}
 	cancel()
 	return err
-}
-
-func cleanQuery(query string) string {
-	return strings.Join(strings.Fields(query), " ")
 }
 
 var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
