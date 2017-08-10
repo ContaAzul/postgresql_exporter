@@ -17,6 +17,7 @@ type Gauges struct {
 	db       *sqlx.DB
 	interval time.Duration
 	labels   prometheus.Labels
+	Errs     *prometheus.GaugeVec
 }
 
 func New(name string, db *sql.DB, interval time.Duration) *Gauges {
@@ -27,6 +28,16 @@ func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 		labels: prometheus.Labels{
 			"database_name": name,
 		},
+		Errs: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Name: "postgresql_query_errors",
+				Help: "queries that failed on the monitoring databases",
+				ConstLabels: prometheus.Labels{
+					"database_name": name,
+				},
+			},
+			[]string{"query"},
+		),
 	}
 }
 
@@ -56,10 +67,7 @@ func (g *Gauges) observeOnce(gauge prometheus.Gauge, query string, params []inte
 	var log = log.WithField("db", g.name)
 	log.Debugf("collecting")
 	var result []float64
-	var err = g.query(query, &result, params)
-	if err != nil {
-		log.WithError(err).Warnf("failed to query: %s", query)
-	} else {
+	if err := g.query(query, &result, params); err == nil {
 		gauge.Set(result[0])
 	}
 }
@@ -82,8 +90,17 @@ func (g *Gauges) query(query string, result interface{}, params []interface{}) e
 		<-ctx.Done()
 	}()
 	var err = g.db.SelectContext(ctx, result, query, params...)
+	if err != nil {
+		var q = cleanQuery(query)
+		g.Errs.With(prometheus.Labels{"query": q}).Inc()
+		log.WithError(err).WithField("query", q).Error("query failed")
+	}
 	cancel()
 	return err
+}
+
+func cleanQuery(query string) string {
+	return strings.Join(strings.Fields(query), " ")
 }
 
 var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)

@@ -32,3 +32,14 @@ func TestIndexBlocksHit(t *testing.T) {
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 }
+
+// TODO: somehow create some bloated index to proper test this
+func TestIndexBloat(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.IndexBloat())
+	assert.Len(metrics, 0)
+	var errs = evaluate(t, gauges.Errs)
+	assert.Len(errs, 0)
+}
