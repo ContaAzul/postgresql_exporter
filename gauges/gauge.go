@@ -17,26 +17,24 @@ type Gauges struct {
 	db       *sqlx.DB
 	interval time.Duration
 	labels   prometheus.Labels
-	Errs     *prometheus.GaugeVec
+	Errs     prometheus.Gauge
 }
 
 func New(name string, db *sql.DB, interval time.Duration) *Gauges {
+	var labels = prometheus.Labels{
+		"database_name": name,
+	}
 	return &Gauges{
 		name:     name,
 		db:       sqlx.NewDb(db, "postgres"),
 		interval: interval,
-		labels: prometheus.Labels{
-			"database_name": name,
-		},
-		Errs: prometheus.NewGaugeVec(
+		labels:   labels,
+		Errs: prometheus.NewGauge(
 			prometheus.GaugeOpts{
-				Name: "postgresql_query_errors",
-				Help: "queries that failed on the monitoring databases",
-				ConstLabels: prometheus.Labels{
-					"database_name": name,
-				},
+				Name:        "postgresql_query_errors",
+				Help:        "queries that failed on the monitoring databases",
+				ConstLabels: labels,
 			},
-			[]string{"query"},
 		),
 	}
 }
@@ -92,7 +90,7 @@ func (g *Gauges) query(query string, result interface{}, params []interface{}) e
 	var err = g.db.SelectContext(ctx, result, query, params...)
 	if err != nil {
 		var q = strings.Join(strings.Fields(query), " ")
-		g.Errs.With(prometheus.Labels{"query": q}).Inc()
+		g.Errs.Inc()
 		log.WithError(err).WithField("query", q).Error("query failed")
 	}
 	cancel()
