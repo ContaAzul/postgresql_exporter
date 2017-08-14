@@ -1,40 +1,49 @@
 package gauges
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"time"
 
-func (g *Gauges) Locks() prometheus.Gauge {
-	return g.new(
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+type lockCountWithMode struct {
+	Mode  string  `db:"mode"`
+	Count float64 `db:"count"`
+}
+
+func (g *Gauges) Locks() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_locks",
-			Help:        "Dabatase lock count",
+			Name:        "postgresql_lock_count",
+			Help:        "count of locks by mode",
 			ConstLabels: g.labels,
 		},
-		`
-			SELECT count(*)
-			FROM pg_locks blocked_locks
-			JOIN pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid
-			JOIN pg_locks blocking_locks ON blocking_locks.locktype = blocked_locks.locktype
-			AND blocking_locks.DATABASE IS NOT DISTINCT
-			FROM blocked_locks.DATABASE
-			AND blocking_locks.relation IS NOT DISTINCT
-			FROM blocked_locks.relation
-			AND blocking_locks.page IS NOT DISTINCT
-			FROM blocked_locks.page
-			AND blocking_locks.tuple IS NOT DISTINCT
-			FROM blocked_locks.tuple
-			AND blocking_locks.virtualxid IS NOT DISTINCT
-			FROM blocked_locks.virtualxid
-			AND blocking_locks.transactionid IS NOT DISTINCT
-			FROM blocked_locks.transactionid
-			AND blocking_locks.classid IS NOT DISTINCT
-			FROM blocked_locks.classid
-			AND blocking_locks.objid IS NOT DISTINCT
-			FROM blocked_locks.objid
-			AND blocking_locks.objsubid IS NOT DISTINCT
-			FROM blocked_locks.objsubid
-			AND blocking_locks.pid != blocked_locks.pid
-			JOIN pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
-			WHERE NOT blocked_locks.GRANTED
-		`,
+		[]string{"mode"},
 	)
+	go func() {
+		for {
+			var locks []lockCountWithMode
+			if err := g.query(
+				`
+					SELECT mode, count(*) as count
+					FROM pg_locks
+					WHERE database = (
+						SELECT datid
+						FROM pg_stat_database
+						WHERE datname = current_database()
+					) GROUP BY mode;
+				`,
+				&locks,
+				emptyParams,
+			); err == nil {
+				for _, lock := range locks {
+					gauge.With(prometheus.Labels{
+						"mode": lock.Mode,
+					}).Set(lock.Count)
+				}
+				time.Sleep(g.interval)
+			}
+		}
+	}()
+	return gauge
 }
