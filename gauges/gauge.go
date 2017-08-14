@@ -13,22 +13,25 @@ import (
 )
 
 type Gauges struct {
-	name     string
-	db       *sqlx.DB
-	interval time.Duration
-	labels   prometheus.Labels
-	Errs     prometheus.Gauge
+	name        string
+	db          *sqlx.DB
+	interval    time.Duration
+	labels      prometheus.Labels
+	Errs        prometheus.Gauge
+	isSuperuser bool
 }
 
 func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 	var labels = prometheus.Labels{
 		"database_name": name,
 	}
+	var dbx = sqlx.NewDb(db, "postgres")
 	return &Gauges{
-		name:     name,
-		db:       sqlx.NewDb(db, "postgres"),
-		interval: interval,
-		labels:   labels,
+		name:        name,
+		db:          dbx,
+		interval:    interval,
+		labels:      labels,
+		isSuperuser: isSuperuser(dbx),
 		Errs: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Name:        "postgresql_query_errors",
@@ -37,6 +40,25 @@ func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 			},
 		),
 	}
+}
+
+func isSuperuser(db *sqlx.DB) (super bool) {
+	if err := db.Get(&super, "select usesuper from pg_user where usename = CURRENT_USER"); err != nil {
+		log.WithError(err).Error("failed to detect user privileges")
+	}
+	return
+}
+
+func (g *Gauges) hasExtension(ext string) bool {
+	var count []int64
+	if err := g.query(
+		"select count(*) from pg_available_extensions where name = $1",
+		&count,
+		paramsFix([]string{ext}),
+	); err != nil {
+		log.WithError(err).Errorf("failed to determine if %s is installed", ext)
+	}
+	return count[0] > 0
 }
 
 func paramsFix(params []string) []interface{} {
