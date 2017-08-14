@@ -32,7 +32,7 @@ func TestDeadTuplesWithoutPgstatTuple(t *testing.T) {
 	assert.NoError(err)
 
 	var metrics = evaluate(t, gauges.DeadTuples())
-	assert.Len(metrics, 1)
+	assert.Len(metrics, 0)
 	for _, m := range metrics {
 		assert.Equal(0.0, m.Value)
 	}

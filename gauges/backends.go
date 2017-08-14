@@ -3,6 +3,7 @@ package gauges
 import (
 	"time"
 
+	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -43,12 +44,19 @@ type backendStatus struct {
 }
 
 func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
-	var opts = prometheus.GaugeOpts{
-		Name:        "postgresql_backends_count",
-		Help:        "Count of connections by state",
-		ConstLabels: g.labels,
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_backends_count",
+			Help:        "Count of connections by state",
+			ConstLabels: g.labels,
+		},
+		[]string{"status", "user"},
+	)
+	if !g.isSuperuser {
+		g.Errs.Inc()
+		log.Error("postgresql_backends_count disabled because it requires a superuser to see queries from other users")
+		return gauge
 	}
-	var gauge = prometheus.NewGaugeVec(opts, []string{"status", "user"})
 	const backendsQuery = `
 		SELECT COUNT(*) as count, state, usename
 		FROM pg_stat_activity
