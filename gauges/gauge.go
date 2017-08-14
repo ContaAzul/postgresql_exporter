@@ -53,10 +53,6 @@ func (g *Gauges) new(opts prometheus.GaugeOpts, query string, params ...string) 
 	return gauge
 }
 
-func (g *Gauges) from(gauge prometheus.Gauge, query string, params ...string) {
-	go g.observe(gauge, query, paramsFix(params))
-}
-
 func (g *Gauges) fromOnce(gauge prometheus.Gauge, query string, params ...string) {
 	go g.observeOnce(gauge, query, paramsFix(params))
 }
@@ -82,7 +78,7 @@ var emptyParams = []interface{}{}
 func (g *Gauges) query(query string, result interface{}, params []interface{}) error {
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(1*time.Second),
+		time.Now().Add(5*time.Second),
 	)
 	defer func() {
 		<-ctx.Done()
