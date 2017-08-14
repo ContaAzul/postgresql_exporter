@@ -86,8 +86,8 @@ func (g *Gauges) query(query string, result interface{}, params []interface{}) e
 	var err = g.db.SelectContext(ctx, result, query, params...)
 	if err != nil {
 		var q = strings.Join(strings.Fields(query), " ")
-		if len(q) > 10 {
-			q = q[:10]
+		if len(q) > 50 {
+			q = q[:50] + "..."
 		}
 		g.Errs.Inc()
 		log.WithError(err).WithField("db", g.name).WithField("query", q).Error("query failed")
