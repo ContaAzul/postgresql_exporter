@@ -50,15 +50,15 @@ func isSuperuser(db *sqlx.DB) (super bool) {
 }
 
 func (g *Gauges) hasExtension(ext string) bool {
-	var count []int64
-	if err := g.query(
-		"select count(*) from pg_available_extensions where name = $1",
+	var count int64
+	if err := g.db.Get(
 		&count,
-		paramsFix([]string{ext}),
+		"select count(*) from pg_available_extensions where name = $1",
+		ext,
 	); err != nil {
 		log.WithError(err).Errorf("failed to determine if %s is installed", ext)
 	}
-	return count[0] > 0
+	return count > 0
 }
 
 func paramsFix(params []string) []interface{} {
