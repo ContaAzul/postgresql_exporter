@@ -1,21 +1,30 @@
 package gauges
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 func (g *Gauges) Up() prometheus.Gauge {
-	lbl := prometheus.Labels{}
-	for k, v := range g.labels {
-		lbl[k] = v
-	}
-	lbl["version"] = g.version()
-	return g.new(
+	var gauge = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_up",
 			Help:        "Dabatase is up and accepting connections",
-			ConstLabels: lbl,
+			ConstLabels: g.labels,
 		},
-		"SELECT 1",
 	)
+	go func() {
+		for {
+			var up = 1.0
+			if err := g.db.Ping(); err != nil {
+				up = 0.0
+			}
+			gauge.Set(up)
+			time.Sleep(g.interval)
+		}
+	}()
+	return gauge
 }
 
 func (g *Gauges) Size() prometheus.Gauge {
