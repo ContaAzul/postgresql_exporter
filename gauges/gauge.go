@@ -43,21 +43,48 @@ func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 }
 
 func isSuperuser(db *sqlx.DB) (super bool) {
-	if err := db.Get(&super, "select usesuper from pg_user where usename = CURRENT_USER"); err != nil {
+	ctx, cancel := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(1*time.Second),
+	)
+	defer func() {
+		<-ctx.Done()
+	}()
+	if err := db.GetContext(
+		ctx,
+		&super,
+		"select usesuper from pg_user where usename = CURRENT_USER",
+	); err != nil {
 		log.WithError(err).Error("failed to detect user privileges")
 	}
+	cancel()
 	return
 }
 
 func (g *Gauges) hasExtension(ext string) bool {
 	var count int64
-	if err := g.db.Get(
+	ctx, cancel := context.WithDeadline(
+		context.Background(),
+		time.Now().Add(1*time.Second),
+	)
+	defer func() {
+		<-ctx.Done()
+	}()
+	if err := g.db.GetContext(
+		ctx,
 		&count,
-		"select count(*) from pg_available_extensions where name = $1",
+		`
+			SELECT count(*)
+			FROM pg_available_extensions
+			WHERE name = $1
+			AND installed_version is not null
+		`,
 		ext,
 	); err != nil {
 		log.WithError(err).Errorf("failed to determine if %s is installed", ext)
 	}
+	cancel()
+	log.Infof("count %d", count)
 	return count > 0
 }
 
