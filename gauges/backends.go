@@ -9,7 +9,7 @@ import (
 func (g *Gauges) Backends() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_totalbackends",
+			Name:        "postgresql_backends_total",
 			Help:        "Total database backends",
 			ConstLabels: g.labels,
 		},
@@ -44,8 +44,8 @@ type backendStatus struct {
 
 func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 	var opts = prometheus.GaugeOpts{
-		Name:        "postgresql_backends",
-		Help:        "Active database connections",
+		Name:        "postgresql_backends_count",
+		Help:        "Count of connections by state",
 		ConstLabels: g.labels,
 	}
 	var gauge = prometheus.NewGaugeVec(opts, []string{"status", "user"})
