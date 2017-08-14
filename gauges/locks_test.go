@@ -13,4 +13,5 @@ func TestLocks(t *testing.T) {
 	var metrics = evaluate(t, gauges.Locks())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }

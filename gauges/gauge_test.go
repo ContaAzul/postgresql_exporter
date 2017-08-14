@@ -41,6 +41,13 @@ func evaluate(t *testing.T, c prometheus.Collector) (result []Metric) {
 	return
 }
 
+func assertNoErrs(t *testing.T, gauges *Gauges) {
+	var assert = assert.New(t)
+	var errs = evaluate(t, gauges.Errs)
+	assert.Len(errs, 1)
+	assert.Equal(0.0, errs[0].Value)
+}
+
 func assertGreaterThan(t *testing.T, expected float64, m Metric) {
 	var assert = assert.New(t)
 	assert.True(
