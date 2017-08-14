@@ -13,6 +13,7 @@ func TestUp(t *testing.T) {
 	var metrics = evaluate(t, gauges.Up())
 	assert.Len(metrics, 1)
 	assert.Equal(1.0, metrics[0].Value, "%s should be 1 ", metrics[0].Name)
+	assertNoErrs(t, gauges)
 }
 
 func TestSize(t *testing.T) {
@@ -22,6 +23,7 @@ func TestSize(t *testing.T) {
 	var metrics = evaluate(t, gauges.Size())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, 1000, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 func TestDeadlocks(t *testing.T) {
@@ -31,6 +33,7 @@ func TestDeadlocks(t *testing.T) {
 	var metrics = evaluate(t, gauges.Deadlocks())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 func TestTempSize(t *testing.T) {
@@ -40,6 +43,7 @@ func TestTempSize(t *testing.T) {
 	var metrics = evaluate(t, gauges.TempSize())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 func TestTempFiles(t *testing.T) {
@@ -49,4 +53,5 @@ func TestTempFiles(t *testing.T) {
 	var metrics = evaluate(t, gauges.TempFiles())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
