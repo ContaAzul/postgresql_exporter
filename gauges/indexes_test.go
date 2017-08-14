@@ -13,6 +13,7 @@ func TestUnusedIndexes(t *testing.T) {
 	var metrics = evaluate(t, gauges.UnusedIndexes())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 func TestIndexBlocksRead(t *testing.T) {
@@ -22,6 +23,7 @@ func TestIndexBlocksRead(t *testing.T) {
 	var metrics = evaluate(t, gauges.IndexBlocksRead())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 func TestIndexBlocksHit(t *testing.T) {
@@ -31,6 +33,7 @@ func TestIndexBlocksHit(t *testing.T) {
 	var metrics = evaluate(t, gauges.IndexBlocksHit())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
 }
 
 // TODO: somehow create some bloated index to proper test this
@@ -40,6 +43,5 @@ func TestIndexBloat(t *testing.T) {
 	defer close()
 	var metrics = evaluate(t, gauges.IndexBloat())
 	assert.Len(metrics, 0)
-	var errs = evaluate(t, gauges.Errs)
-	assert.Len(errs, 0)
+	assertNoErrs(t, gauges)
 }

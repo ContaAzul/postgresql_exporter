@@ -19,4 +19,5 @@ func TestDeadTuples(t *testing.T) {
 	for _, m := range metrics {
 		assert.Equal(0.0, m.Value)
 	}
+	assertNoErrs(t, gauges)
 }
