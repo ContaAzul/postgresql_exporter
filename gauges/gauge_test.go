@@ -48,6 +48,13 @@ func assertNoErrs(t *testing.T, gauges *Gauges) {
 	assert.Equal(0.0, errs[0].Value)
 }
 
+func assertErrs(t *testing.T, gauges *Gauges, errors int) {
+	var assert = assert.New(t)
+	var errs = evaluate(t, gauges.Errs)
+	assert.Len(errs, 1)
+	assert.Equal(float64(errors), errs[0].Value)
+}
+
 func assertGreaterThan(t *testing.T, expected float64, m Metric) {
 	var assert = assert.New(t)
 	assert.True(
