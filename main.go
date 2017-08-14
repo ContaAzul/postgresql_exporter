@@ -19,7 +19,7 @@ import (
 var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
-	interval   = flag.Duration("interval", 20*time.Second, "interval between gathering metrics")
+	interval   = flag.Duration("interval", 30*time.Second, "interval between gathering metrics")
 	maxDBConns = flag.Int("max-db-connections", 1, "max connections to open to each database")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
