@@ -65,7 +65,7 @@ func assertGreaterThan(t *testing.T, expected float64, m Metric) {
 
 func prepare(t *testing.T) (*sql.DB, *Gauges, func()) {
 	var db = connect(t)
-	var gauges = New("test", db, 1*time.Minute)
+	var gauges = New("test", db, 1*time.Minute, 1*time.Second)
 	return db, gauges, func() {
 		assert.NoError(t, db.Close())
 	}
