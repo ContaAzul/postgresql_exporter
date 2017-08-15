@@ -20,6 +20,7 @@ var (
 	addr       = flag.String("listen-address", ":9111", "The address to listen on for HTTP requests.")
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
 	interval   = flag.Duration("interval", 30*time.Second, "interval between gathering metrics")
+	timeout    = flag.Duration("timeout", 15*time.Second, "query timeout")
 	maxDBConns = flag.Int("max-db-connections", 1, "max connections to open to each database")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
@@ -60,7 +61,7 @@ func main() {
 }
 
 func watch(db *sql.DB, reg prometheus.Registerer, name string) {
-	var gauges = gauges.New(name, db, *interval)
+	var gauges = gauges.New(name, db, *interval, *timeout)
 	reg.MustRegister(gauges.Errs)
 
 	reg.MustRegister(gauges.Backends())

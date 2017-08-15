@@ -16,12 +16,13 @@ type Gauges struct {
 	name        string
 	db          *sqlx.DB
 	interval    time.Duration
+	timeout     time.Duration
 	labels      prometheus.Labels
 	Errs        prometheus.Gauge
 	isSuperuser bool
 }
 
-func New(name string, db *sql.DB, interval time.Duration) *Gauges {
+func New(name string, db *sql.DB, interval, timeout time.Duration) *Gauges {
 	var labels = prometheus.Labels{
 		"database_name": name,
 	}
@@ -30,8 +31,9 @@ func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 		name:        name,
 		db:          dbx,
 		interval:    interval,
+		timeout:     timeout,
 		labels:      labels,
-		isSuperuser: isSuperuser(dbx),
+		isSuperuser: isSuperuser(dbx, timeout),
 		Errs: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Name:        "postgresql_query_errors",
@@ -42,10 +44,10 @@ func New(name string, db *sql.DB, interval time.Duration) *Gauges {
 	}
 }
 
-func isSuperuser(db *sqlx.DB) (super bool) {
+func isSuperuser(db *sqlx.DB, timeout time.Duration) (super bool) {
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(1*time.Second),
+		time.Now().Add(timeout),
 	)
 	defer func() {
 		<-ctx.Done()
@@ -65,7 +67,7 @@ func (g *Gauges) hasExtension(ext string) bool {
 	var count int64
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(1*time.Second),
+		time.Now().Add(g.timeout),
 	)
 	defer func() {
 		<-ctx.Done()
@@ -127,7 +129,7 @@ var emptyParams = []interface{}{}
 func (g *Gauges) query(query string, result interface{}, params []interface{}) error {
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(5*time.Second),
+		time.Now().Add(g.timeout),
 	)
 	defer func() {
 		<-ctx.Done()
