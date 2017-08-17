@@ -12,12 +12,11 @@ type Relation struct {
 }
 
 func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
-	var opts = prometheus.GaugeOpts{
+	var gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name:        "postgresql_dead_tuples_pct",
 		Help:        "dead tuples percentage on the top 20 biggest tables",
 		ConstLabels: g.labels,
-	}
-	var gauge = prometheus.NewGaugeVec(opts, []string{"table"})
+	}, []string{"table"})
 
 	if !g.isSuperuser {
 		g.Errs.Inc()
@@ -50,7 +49,7 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 					&pct,
 					[]interface{}{table.Name},
 					1*time.Minute,
-				); err != nil {
+				); err == nil {
 					gauge.With(prometheus.Labels{"table": table.Name}).Set(pct[0])
 				}
 			}

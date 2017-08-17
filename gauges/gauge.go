@@ -86,7 +86,6 @@ func (g *Gauges) hasExtension(ext string) bool {
 		log.WithError(err).Errorf("failed to determine if %s is installed", ext)
 	}
 	cancel()
-	log.Infof("count %d", count)
 	return count > 0
 }
 
