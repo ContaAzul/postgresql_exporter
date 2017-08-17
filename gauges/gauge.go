@@ -86,7 +86,6 @@ func (g *Gauges) hasExtension(ext string) bool {
 		log.WithError(err).Errorf("failed to determine if %s is installed", ext)
 	}
 	cancel()
-	log.Infof("count %d", count)
 	return count > 0
 }
 
@@ -126,10 +125,23 @@ func (g *Gauges) observe(gauge prometheus.Gauge, query string, params []interfac
 
 var emptyParams = []interface{}{}
 
-func (g *Gauges) query(query string, result interface{}, params []interface{}) error {
+func (g *Gauges) query(
+	query string,
+	result interface{},
+	params []interface{},
+) error {
+	return g.queryWithTimeout(query, result, params, g.timeout)
+}
+
+func (g *Gauges) queryWithTimeout(
+	query string,
+	result interface{},
+	params []interface{},
+	timeout time.Duration,
+) error {
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(g.timeout),
+		time.Now().Add(timeout),
 	)
 	defer func() {
 		<-ctx.Done()
