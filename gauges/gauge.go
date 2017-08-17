@@ -126,10 +126,23 @@ func (g *Gauges) observe(gauge prometheus.Gauge, query string, params []interfac
 
 var emptyParams = []interface{}{}
 
-func (g *Gauges) query(query string, result interface{}, params []interface{}) error {
+func (g *Gauges) query(
+	query string,
+	result interface{},
+	params []interface{},
+) error {
+	return g.queryWithTimeout(query, result, params, g.timeout)
+}
+
+func (g *Gauges) queryWithTimeout(
+	query string,
+	result interface{},
+	params []interface{},
+	timeout time.Duration,
+) error {
 	ctx, cancel := context.WithDeadline(
 		context.Background(),
-		time.Now().Add(g.timeout),
+		time.Now().Add(timeout),
 	)
 	defer func() {
 		<-ctx.Done()
