@@ -141,7 +141,11 @@ func (g *Gauges) query(query string, result interface{}, params []interface{}) e
 			q = q[:50] + "..."
 		}
 		g.Errs.Inc()
-		log.WithError(err).WithField("db", g.name).WithField("query", q).Error("query failed")
+		log.WithError(err).
+			WithField("db", g.name).
+			WithField("query", q).
+			WithField("params", params).
+			Error("query failed")
 	}
 	cancel()
 	return err
