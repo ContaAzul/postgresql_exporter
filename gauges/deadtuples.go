@@ -19,13 +19,11 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	}, []string{"table"})
 
 	if !g.isSuperuser {
-		g.Errs.Inc()
-		log.Error("postgresql_dead_tuples_pct disabled because pgstattuple requires a superuser")
+		log.Warn("postgresql_dead_tuples_pct disabled because pgstattuple requires a superuser")
 		return gauge
 	}
 	if !g.hasExtension("pgstattuple") {
-		g.Errs.Inc()
-		log.Error("postgresql_dead_tuples_pct disabled because pgstattuple extension is not installed")
+		log.Warn("postgresql_dead_tuples_pct disabled because pgstattuple extension is not installed")
 		return gauge
 	}
 

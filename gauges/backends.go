@@ -53,8 +53,7 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 		[]string{"status", "user"},
 	)
 	if !g.isSuperuser {
-		g.Errs.Inc()
-		log.Error("postgresql_backends_count disabled because it requires a superuser to see queries from other users")
+		log.Warn("postgresql_backends_count disabled because it requires a superuser to see queries from other users")
 		return gauge
 	}
 	const backendsQuery = `
