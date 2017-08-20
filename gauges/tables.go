@@ -148,8 +148,8 @@ func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 						"table": table.Name,
 					}).Set(table.Pct)
 				}
-				time.Sleep(g.interval)
 			}
+			time.Sleep(g.interval)
 		}
 	}()
 	return gauge

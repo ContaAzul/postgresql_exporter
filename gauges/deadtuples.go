@@ -11,6 +11,13 @@ type Relation struct {
 	Name string `db:"relname"`
 }
 
+var relationsQuery = `
+SELECT relname
+FROM pg_stat_user_tables
+ORDER BY n_tup_ins + n_tup_upd desc
+LIMIT 20
+`
+
 func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name:        "postgresql_dead_tuples_pct",
@@ -30,16 +37,7 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	go func() {
 		for {
 			var tables []Relation
-			g.query(
-				`
-					SELECT relname
-					FROM pg_stat_user_tables
-					ORDER BY n_tup_ins + n_tup_upd desc
-					LIMIT 20
-				`,
-				&tables,
-				emptyParams,
-			)
+			g.query(relationsQuery, &tables, emptyParams)
 			for _, table := range tables {
 				var pct []float64
 				if err := g.queryWithTimeout(

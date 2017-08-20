@@ -41,8 +41,8 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 						"mode": lock.Mode,
 					}).Set(lock.Count)
 				}
-				time.Sleep(g.interval)
 			}
+			time.Sleep(g.interval)
 		}
 	}()
 	return gauge

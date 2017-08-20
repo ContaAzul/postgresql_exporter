@@ -179,8 +179,8 @@ func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
 						"index": idx.Name,
 					}).Set(idx.Pct)
 				}
-				time.Sleep(g.interval)
 			}
+			time.Sleep(g.interval)
 		}
 	}()
 	return gauge
