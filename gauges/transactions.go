@@ -10,7 +10,7 @@ func (g *Gauges) TransactionsSum() prometheus.Gauge {
 			ConstLabels: g.labels,
 		},
 		`
-			SELECT xact_commit + xact_rollback as tps
+			SELECT xact_commit + xact_rollback
 			FROM pg_stat_database
 			WHERE datname = current_database()
 		`,
