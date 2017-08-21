@@ -1,6 +1,7 @@
 package gauges
 
 import (
+	"strings"
 	"time"
 
 	"github.com/apex/log"
@@ -37,7 +38,7 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 			if err := g.query(slowQueriesQuery, &queries, emptyParams); err == nil {
 				for _, query := range queries {
 					gauge.With(prometheus.Labels{
-						"query": query.Query,
+						"query": strings.Join(strings.Fields(query.Query), " "),
 					}).Set(query.Time)
 				}
 			}
