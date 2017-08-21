@@ -63,6 +63,14 @@ func isSuperuser(db *sqlx.DB, timeout time.Duration) (super bool) {
 	return
 }
 
+func (g *Gauges) hasSharedPreloadLibrary(lib string) bool {
+	var libs []string
+	if err := g.query("SHOW shared_preload_libraries", &libs, emptyParams); err != nil {
+		return false
+	}
+	return strings.Contains(libs[0], lib)
+}
+
 func (g *Gauges) hasExtension(ext string) bool {
 	var count int64
 	ctx, cancel := context.WithDeadline(
