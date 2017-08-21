@@ -15,3 +15,12 @@ func TestTableBloat(t *testing.T) {
 	assert.Len(metrics, 0)
 	assertNoErrs(t, gauges)
 }
+
+func TestTableUsage(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.TableUsage())
+	assert.True(len(metrics) > 0)
+	assertNoErrs(t, gauges)
+}
