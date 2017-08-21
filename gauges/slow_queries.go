@@ -32,6 +32,10 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 		log.Warn("postgresql_slowest_queries disabled because pg_stat_statements extension is not installed")
 		return gauge
 	}
+	if !g.hasSharedPreloadLibrary("pg_stat_statements") {
+		log.Warn("postgresql_slowest_queries disabled because pg_stat_statements is not on shared_preload_libraries")
+		return gauge
+	}
 	go func() {
 		for {
 			var queries []slowQuery
