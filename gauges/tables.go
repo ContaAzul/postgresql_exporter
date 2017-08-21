@@ -154,3 +154,72 @@ func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 	}()
 	return gauge
 }
+
+var tableUsageQuery = `
+	WITH top_big_tables as (
+	SELECT relname, pg_total_relation_size(relid)
+	FROM pg_catalog.pg_statio_user_tables
+	ORDER BY pg_total_relation_size(relid) desc
+	LIMIT 20
+	)
+	SELECT  s.relname,
+			coalesce(s.seq_tup_read, 0) as seq_tup_read,
+			coalesce(s.idx_tup_fetch, 0) as idx_tup_fetch,
+			coalesce(s.n_tup_ins, 0) as n_tup_ins,
+			coalesce(s.n_tup_upd, 0) as n_tup_upd,
+			coalesce(s.n_tup_del, 0) as n_tup_del
+	FROM top_big_tables tbt
+	JOIN pg_stat_all_tables s on s.relname = tbt.relname
+	ORDER BY 2 desc
+`
+
+type tableUsage struct {
+	Name      string  `db:"relname"`
+	SeqReads  float64 `db:"seq_tup_read"`
+	IdxFetchs float64 `db:"idx_tup_fetch"`
+	Inserts   float64 `db:"n_tup_ins"`
+	Updates   float64 `db:"n_tup_upd"`
+	Deletes   float64 `db:"n_tup_del"`
+}
+
+func (g *Gauges) TableUsage() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_table_usage",
+			Help:        "table usage statistics",
+			ConstLabels: g.labels,
+		},
+		[]string{"table", "stat"},
+	)
+	go func() {
+		for {
+			var tables []tableUsage
+			if err := g.query(tableUsageQuery, &tables, emptyParams); err == nil {
+				for _, table := range tables {
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"stat":  "seq_tup_read",
+					}).Set(table.SeqReads)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"stat":  "idx_tup_fetch",
+					}).Set(table.IdxFetchs)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"stat":  "n_tup_ins",
+					}).Set(table.Inserts)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"stat":  "n_tup_upd",
+					}).Set(table.Updates)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"stat":  "n_tup_del",
+					}).Set(table.Deletes)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+	return gauge
+}

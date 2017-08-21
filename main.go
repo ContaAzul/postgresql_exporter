@@ -85,6 +85,7 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.SlowestQueries())
 	reg.MustRegister(gauges.StreamingWALs())
 	reg.MustRegister(gauges.TableBloat())
+	reg.MustRegister(gauges.TableUsage())
 	reg.MustRegister(gauges.TempFiles())
 	reg.MustRegister(gauges.TempSize())
 	reg.MustRegister(gauges.TransactionsSum())
