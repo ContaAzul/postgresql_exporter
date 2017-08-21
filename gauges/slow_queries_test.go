@@ -10,6 +10,10 @@ func TestSlowestQueries(t *testing.T) {
 	var assert = assert.New(t)
 	db, gauges, close := prepare(t)
 	defer close()
+	if !gauges.hasSharedPreloadLibrary("pg_stat_statements") {
+		t.Skip("pg_stat_statements not in shared_preload_libraries")
+		return
+	}
 	_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
 	assert.NoError(err)
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS slowest_queries AS SELECT generate_series(1, 200) AS id, md5(random()::text) AS desc")
@@ -33,6 +37,10 @@ func TestSlowestQueriesExtensionNotInstalled(t *testing.T) {
 	var assert = assert.New(t)
 	db, gauges, close := prepare(t)
 	defer close()
+	if !gauges.hasSharedPreloadLibrary("pg_stat_statements") {
+		t.Skip("pg_stat_statements not in shared_preload_libraries")
+		return
+	}
 	_, err := db.Exec("DROP EXTENSION IF EXISTS pg_stat_statements")
 	assert.NoError(err)
 
