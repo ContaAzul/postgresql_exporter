@@ -38,9 +38,10 @@ func (g *Gauges) MaxBackends() prometheus.Gauge {
 }
 
 type backendStatus struct {
-	Count float64 `db:"count"`
-	User  string  `db:"usename"`
-	State string  `db:"state"`
+	Count      float64 `db:"count"`
+	User       string  `db:"usename"`
+	ClientAddr string  `db:"client_addr"`
+	State      string  `db:"state"`
 }
 
 func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
@@ -50,17 +51,17 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 			Help:        "Count of connections by state",
 			ConstLabels: g.labels,
 		},
-		[]string{"status", "user"},
+		[]string{"status", "user", "client_addr"},
 	)
 	if !g.isSuperuser {
 		log.Warn("postgresql_backends_count disabled because it requires a superuser to see queries from other users")
 		return gauge
 	}
 	const backendsQuery = `
-		SELECT COUNT(*) as count, state, usename
+		SELECT COUNT(*) as count, state, usename, client_addr
 		FROM pg_stat_activity
 		WHERE datname = current_database()
-		GROUP BY state, usename
+		GROUP BY state, usename, client_addr
 	`
 	go func() {
 		for _, q := range []string{
@@ -71,8 +72,9 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 			g.query(q, &statuteses, emptyParams)
 			for _, status := range statuteses {
 				gauge.With(prometheus.Labels{
-					"status": status.State,
-					"user":   status.User,
+					"status":      status.State,
+					"user":        status.User,
+					"client_addr": status.ClientAddr,
 				}).Set(status.Count)
 			}
 		}
