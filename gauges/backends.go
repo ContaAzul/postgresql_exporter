@@ -58,9 +58,10 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 		return gauge
 	}
 	const backendsQuery = `
-		SELECT COUNT(*) as count, state, usename, client_addr
+		SELECT COUNT(*) AS count, state, usename, client_addr
 		FROM pg_stat_activity
 		WHERE datname = current_database()
+		AND client_addr IS NOT NULL
 		GROUP BY state, usename, client_addr
 	`
 	go func() {
