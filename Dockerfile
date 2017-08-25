@@ -1,4 +1,4 @@
-FROM golang:1.9rc2-alpine3.6 AS builder
+FROM golang:1.9-alpine3.6 AS builder
 WORKDIR /go/src/github.com/ContaAzul/postgresql_exporter
 ADD . .
 RUN apk add -U git
