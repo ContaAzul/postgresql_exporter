@@ -37,6 +37,17 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 		server.Handler = httplog.New(http.DefaultServeMux)
 	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(
+			`<html>
+			<head><title>ContaAzul PostgreSQL Exporter</title></head>
+			<body>
+				<h1>ContaAzul PostgreSQL Exporter</h1>
+				<p><a href='/metrics'>Metrics</a></p>
+			</body>
+			</html>
+		`))
+	})
 	http.Handle("/metrics", promhttp.Handler())
 	var config = config.Parse(*configFile)
 	for _, con := range config.Databases {
