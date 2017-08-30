@@ -49,7 +49,7 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 					gauge.With(prometheus.Labels{"table": table.Name}).Set(pct[0])
 				}
 			}
-			time.Sleep(1 * time.Hour)
+			time.Sleep(12 * time.Hour)
 		}
 	}()
 
