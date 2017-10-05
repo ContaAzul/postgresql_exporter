@@ -1,9 +1,14 @@
+dist: trusty
+sudo: required
 language: go
-go:
-  - 1.8.x
+go: 1.9
 services:
+  - docker
   - postgresql
 install: make setup
 script: make test
+after_success:
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
 notifications:
   email: false
