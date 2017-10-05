@@ -1,0 +1,21 @@
+project_name: postgresql_exporter
+release:
+  github:
+    owner: ContaAzul
+    name: postgresql_exporter
+builds:
+- goos:
+  - linux
+  - darwin
+  goarch:
+  - amd64
+  env:
+  - CGO_ENABLED=0
+archive:
+  files:
+  - config.yml
+dockers:
+- image: caninjas/postgresql_exporter
+  latest: true
+  extra_files:
+  - config.yml
