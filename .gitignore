@@ -1,3 +1,4 @@
 vendor
 test_config.yml
 postgresql_exporter
+dist

@@ -10,7 +10,7 @@ import (
 	"github.com/ContaAzul/postgresql_exporter/gauges"
 	"github.com/apex/httplog"
 	"github.com/apex/log"
-	"github.com/apex/log/handlers/text"
+	"github.com/apex/log/handlers/logfmt"
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -26,7 +26,7 @@ var (
 )
 
 func main() {
-	log.SetHandler(text.Default)
+	log.SetHandler(logfmt.Default)
 	flag.Parse()
 	var server = &http.Server{
 		Addr:         *addr,

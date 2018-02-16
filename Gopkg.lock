@@ -10,7 +10,10 @@
 [[projects]]
   branch = "master"
   name = "github.com/apex/log"
-  packages = [".","handlers/text"]
+  packages = [
+    ".",
+    "handlers/logfmt"
+  ]
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
 
 [[projects]]
@@ -26,6 +29,12 @@
   version = "v1.1.0"
 
 [[projects]]
+  name = "github.com/go-logfmt/logfmt"
+  packages = ["."]
+  revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
+  version = "v0.3.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -34,13 +43,25 @@
 [[projects]]
   branch = "master"
   name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
+  packages = [
+    ".",
+    "reflectx"
+  ]
   revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
 
 [[projects]]
   branch = "master"
+  name = "github.com/kr/logfmt"
+  packages = ["."]
+  revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
+
+[[projects]]
+  branch = "master"
   name = "github.com/lib/pq"
-  packages = [".","oid"]
+  packages = [
+    ".",
+    "oid"
+  ]
   revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
 
 [[projects]]
@@ -63,7 +84,10 @@
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus","prometheus/promhttp"]
+  packages = [
+    "prometheus",
+    "prometheus/promhttp"
+  ]
   revision = "c5b7fccd204277076155f10851dad72b76a49317"
   version = "v0.8.0"
 
@@ -76,13 +100,20 @@
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/common"
-  packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model"
+  ]
   revision = "61f87aac8082fa8c3c5655c7608d7478d46ac2ad"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
-  packages = [".","xfs"]
+  packages = [
+    ".",
+    "xfs"
+  ]
   revision = "e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2"
 
 [[projects]]
@@ -100,6 +131,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "36eea53046239eadd8c83bac04b588d70bc55c7003dd8668402abf5fb1634120"
+  inputs-digest = "8f201ed389799670eb7b85c0ec57f03e6a1c7fe751400e9b58070ca404c33ec7"
   solver-name = "gps-cdcl"
   solver-version = 1
