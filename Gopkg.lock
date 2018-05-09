@@ -8,19 +8,19 @@
   revision = "d677fdf2ae1fa75d8111faf17f2d6fcf46dd9af7"
 
 [[projects]]
-  branch = "master"
   name = "github.com/apex/log"
   packages = [
     ".",
     "handlers/logfmt"
   ]
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
-  revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
+  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
   name = "github.com/davecgh/go-spew"
@@ -35,10 +35,10 @@
   version = "v0.3.0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "ab9f9a6dab164b7d1246e0e688b0ab7b94d8553e"
+  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
+  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -47,7 +47,7 @@
     ".",
     "reflectx"
   ]
-  revision = "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f"
+  revision = "2aeb6a910c2b94f2d5eb53d9895d80e27264ec41"
 
 [[projects]]
   branch = "master"
@@ -62,7 +62,7 @@
     ".",
     "oid"
   ]
-  revision = "e42267488fe361b9dc034be7a6bffef5b195bceb"
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -95,7 +95,7 @@
   branch = "master"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
-  revision = "6f3806018612930941127f2a7c6c453ba2c527d2"
+  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
 
 [[projects]]
   branch = "master"
@@ -105,28 +105,30 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "61f87aac8082fa8c3c5655c7608d7478d46ac2ad"
+  revision = "d811d2e9bf898806ecfb6ef6296774b13ffc314c"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
+    "internal/util",
+    "nfs",
     "xfs"
   ]
-  revision = "e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2"
+  revision = "8b1c2da0d56deffdbb9e48d4414b4e674bd8083e"
 
 [[projects]]
   name = "github.com/stretchr/testify"
   packages = ["assert"]
-  revision = "69483b4bd14f5845b5a1e55bca19e954e827f1d0"
-  version = "v1.1.4"
+  revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
+  version = "v1.2.1"
 
 [[projects]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
-  revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
+  revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
+  version = "v2.2.1"
 
 [solve-meta]
   analyzer-name = "dep"
