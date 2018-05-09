@@ -13,6 +13,6 @@ test:
 lint:
 	gometalinter.v2 --vendor --deadline=60s ./...
 
-ci: test lint
+ci: test
 
 .DEFAULT_GOAL := build
