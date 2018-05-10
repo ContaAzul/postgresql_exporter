@@ -19,6 +19,10 @@ archive:
   - config.yml
 dockers:
 - image: caninjas/postgresql_exporter
-  latest: true
+  tag_templates:
+    - '{{ .Tag }}'
+    - 'v{{ .Major }}'
+    - 'v{{ .Major }}.{{ .Minor }}'
+    - latest
   extra_files:
   - config.yml
