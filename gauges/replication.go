@@ -2,6 +2,8 @@ package gauges
 
 import "github.com/prometheus/client_golang/prometheus"
 
+// ReplicationStatus returns a prometheus gauge for the PostgreSQL
+// replication status
 func (g *Gauges) ReplicationStatus() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
@@ -26,6 +28,8 @@ func (g *Gauges) ReplicationStatus() prometheus.Gauge {
 	)
 }
 
+// StreamingWALs returns a prometheus gauge for the count of WALs
+// in streaming state
 func (g *Gauges) StreamingWALs() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
@@ -41,6 +45,8 @@ func (g *Gauges) StreamingWALs() prometheus.Gauge {
 	)
 }
 
+// ReplicationLag returns a prometheus gauge for the database replication
+// lag in milliseconds
 func (g *Gauges) ReplicationLag() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
