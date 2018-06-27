@@ -29,7 +29,7 @@ func (g *Gauges) ReplicationStatus() prometheus.Gauge {
 			ELSE
 				-1
 			END`,
-			postgres.Version(g.version()).IsLogReplayPausedFunctionName(),
+			postgres.Version(g.version()).IsWalReplayPausedFunctionName(),
 		),
 	)
 }
@@ -75,8 +75,8 @@ func (g *Gauges) ReplicationLag() prometheus.Gauge {
 					END
 				END
 			, 0)`,
-			version.LastReceivedLsnFunctionName(),
-			version.LastReplayedLsnFunctionName(),
+			version.LastWalReceivedLsnFunctionName(),
+			version.LastWalReplayedLsnFunctionName(),
 		),
 	)
 }

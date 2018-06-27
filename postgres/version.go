@@ -5,27 +5,27 @@ import "strings"
 // Version for a postgres server
 type Version string
 
-// IsLogReplayPausedFunctionName returns the name of the function to verify wether the replication log is paused
-// according to the postgres version
-func (v Version) IsLogReplayPausedFunctionName() string {
+// IsWalReplayPausedFunctionName returns the name of the function to verify whether the replication
+// log is paused according to the postgres version
+func (v Version) IsWalReplayPausedFunctionName() string {
 	if v.is10() {
 		return "pg_is_wal_replay_paused"
 	}
 	return "pg_is_xlog_replay_paused"
 }
 
-// LastReceivedLsnFunctionName returns the name the of the function that returns the last received LSN
-// according to the postgres version
-func (v Version) LastReceivedLsnFunctionName() string {
+// LastWalReceivedLsnFunctionName returns the name of the function that returns the last write-ahead
+// log location received and synced to disk by replication according to the postgres version
+func (v Version) LastWalReceivedLsnFunctionName() string {
 	if v.is10() {
 		return "pg_last_wal_receive_lsn"
 	}
 	return "pg_last_xlog_receive_location"
 }
 
-// LastReplayedLsnFunctionName returns the name the of the function that returns the last replayed LSN
-// according to the postgres version
-func (v Version) LastReplayedLsnFunctionName() string {
+// LastWalReplayedLsnFunctionName returns the name of the function that returns the last write-ahead
+// log location replayed during recovery according to the postgres version
+func (v Version) LastWalReplayedLsnFunctionName() string {
 	if v.is10() {
 		return "pg_last_wal_replay_lsn"
 	}
