@@ -3,6 +3,7 @@ package gauges
 import (
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -85,7 +86,7 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 }
 
 func (g *Gauges) waitingBackendsQuery() string {
-	if isPG96(g.version()) || isPG10(g.version()) {
+	if postgres.Version(g.version()).Is96Or10() {
 		return `
 			SELECT COUNT(*) as count, 'waiting' as state, usename
 			FROM pg_stat_activity

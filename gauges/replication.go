@@ -3,6 +3,7 @@ package gauges
 import (
 	"fmt"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -28,7 +29,7 @@ func (g *Gauges) ReplicationStatus() prometheus.Gauge {
 			ELSE
 				-1
 			END`,
-			g.defineFunction("pg_is_wal_replay_paused", "pg_is_xlog_replay_paused"),
+			postgres.Version(g.version()).IsLogReplayPausedFunctionName(),
 		),
 	)
 }
@@ -53,6 +54,8 @@ func (g *Gauges) StreamingWALs() prometheus.Gauge {
 // ReplicationLag returns a prometheus gauge for the database replication
 // lag in milliseconds
 func (g *Gauges) ReplicationLag() prometheus.Gauge {
+	version := postgres.Version(g.version())
+
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_replication_lag",
@@ -72,15 +75,8 @@ func (g *Gauges) ReplicationLag() prometheus.Gauge {
 					END
 				END
 			, 0)`,
-			g.defineFunction("pg_last_wal_receive_lsn", "pg_last_xlog_receive_location"),
-			g.defineFunction("pg_last_wal_replay_lsn", "pg_last_xlog_replay_location"),
+			version.LastReceivedLsnFunctionName(),
+			version.LastReplayedLsnFunctionName(),
 		),
 	)
-}
-
-func (g *Gauges) defineFunction(pg10Function, pg9xFunction string) string {
-	if isPG10(g.version()) {
-		return pg10Function
-	}
-	return pg9xFunction
 }
