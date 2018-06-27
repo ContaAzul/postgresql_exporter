@@ -85,7 +85,7 @@ func (g *Gauges) BackendsStatus() *prometheus.GaugeVec {
 }
 
 func (g *Gauges) waitingBackendsQuery() string {
-	if isPG96(g.version()) {
+	if isPG96(g.version()) || isPG10(g.version()) {
 		return `
 			SELECT COUNT(*) as count, 'waiting' as state, usename
 			FROM pg_stat_activity
