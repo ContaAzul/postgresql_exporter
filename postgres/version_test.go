@@ -28,7 +28,7 @@ func TestFunctionVersions(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		testName := fmt.Sprintf("expecting %v(\"%v\") to be %v", tc.str, tc.fn, tc.expected)
+		testName := fmt.Sprintf("expecting %p(\"%v\") to be %v", tc.fn, tc.str, tc.expected)
 		t.Run(testName, func(t *testing.T) {
 			assert.Equal(t, tc.fn(Version(tc.str)), tc.expected)
 		})
