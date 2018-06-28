@@ -3,7 +3,6 @@ package gauges
 import (
 	"context"
 	"database/sql"
-	"regexp"
 	"strings"
 	"time"
 
@@ -171,17 +170,11 @@ func (g *Gauges) queryWithTimeout(
 	return err
 }
 
-var versionRE = regexp.MustCompile(`^PostgreSQL (\d\.\d\.\d).*`)
-
 func (g *Gauges) version() string {
 	var version string
-	if err := g.db.QueryRow("select version()").Scan(&version); err != nil {
+	if err := g.db.QueryRow("show server_version").Scan(&version); err != nil {
 		log.WithError(err).Error("failed to get postgresql version, assuming 9.6.0")
 		return "9.6.0"
 	}
-	return versionRE.FindStringSubmatch(version)[1]
-}
-
-func isPG96(version string) bool {
-	return strings.HasPrefix(version, "9.6.")
+	return version
 }

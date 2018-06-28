@@ -83,3 +83,11 @@ func connect(t *testing.T) *sql.DB {
 	db.SetMaxOpenConns(1)
 	return db
 }
+
+func TestVersion(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	assert.NotEmpty(gauges.version())
+	assertNoErrs(t, gauges)
+}
