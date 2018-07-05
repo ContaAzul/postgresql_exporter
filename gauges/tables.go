@@ -223,3 +223,44 @@ func (g *Gauges) TableUsage() *prometheus.GaugeVec {
 	}()
 	return gauge
 }
+
+var tableSecScansQuery = `
+	select relname, seq_scan from pg_stat_user_tables
+`
+
+type tableSecScans struct {
+	Name    string  `db:"relname"`
+	SecScan float64 `db:"seq_scan"`
+	IdxScan float64 `db:"seq_scan"`
+}
+
+func (g *Gauges) TableScans() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_scans",
+			Help:        "table scans statistics",
+			ConstLabels: g.labels,
+		},
+		[]string{"table", "scan"},
+	)
+	go func() {
+		for {
+			var tables []tableSecScans
+			if err := g.query(tableSecScansQuery, &tables, emptyParams); err == nil {
+				for _, table := range tables {
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"scan":  "seq_scan",
+					}).Set(table.SecScan)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"scan":  "idx_scan",
+					}).Set(table.IdxScan)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
+}
