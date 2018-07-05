@@ -218,7 +218,10 @@ func (g *Gauges) TableUsage() *prometheus.GaugeVec {
 }
 
 var tableSecScansQuery = `
-	select relname, coalesce(seq_scan, 0), icoalesce(idx_scan, 0) from pg_stat_user_tables
+	select relname, 
+		coalesce(seq_scan, 0) as seq_scan, 
+		coalesce(idx_scan, 0) as idx_scan
+	from pg_stat_user_tables
 `
 
 type tableScans struct {
