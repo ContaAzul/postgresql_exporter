@@ -237,7 +237,7 @@ type tableScans struct {
 func (g *Gauges) TableScans() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_scans",
+			Name:        "postgresql_table_scans",
 			Help:        "table scans statistics",
 			ConstLabels: g.labels,
 		},
