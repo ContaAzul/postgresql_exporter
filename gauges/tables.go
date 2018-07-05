@@ -156,20 +156,13 @@ func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 }
 
 var tableUsageQuery = `
-	WITH top_big_tables as (
-	SELECT relname, pg_total_relation_size(relid)
-	FROM pg_catalog.pg_statio_user_tables
-	ORDER BY pg_total_relation_size(relid) desc
-	LIMIT 20
-	)
 	SELECT  s.relname,
 			coalesce(s.seq_tup_read, 0) as seq_tup_read,
 			coalesce(s.idx_tup_fetch, 0) as idx_tup_fetch,
 			coalesce(s.n_tup_ins, 0) as n_tup_ins,
 			coalesce(s.n_tup_upd, 0) as n_tup_upd,
 			coalesce(s.n_tup_del, 0) as n_tup_del
-	FROM top_big_tables tbt
-	JOIN pg_stat_all_tables s on s.relname = tbt.relname
+	FROM pg_stat_user_tables s
 	ORDER BY 2 desc
 `
 
@@ -221,5 +214,49 @@ func (g *Gauges) TableUsage() *prometheus.GaugeVec {
 			time.Sleep(g.interval)
 		}
 	}()
+	return gauge
+}
+
+var tableSecScansQuery = `
+	select relname, 
+		coalesce(seq_scan, 0) as seq_scan, 
+		coalesce(idx_scan, 0) as idx_scan
+	from pg_stat_user_tables
+`
+
+type tableScans struct {
+	Name    string  `db:"relname"`
+	SecScan float64 `db:"seq_scan"`
+	IdxScan float64 `db:"idx_scan"`
+}
+
+func (g *Gauges) TableScans() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_table_scans",
+			Help:        "table scans statistics",
+			ConstLabels: g.labels,
+		},
+		[]string{"table", "scan"},
+	)
+	go func() {
+		for {
+			var tables []tableScans
+			if err := g.query(tableSecScansQuery, &tables, emptyParams); err == nil {
+				for _, table := range tables {
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"scan":  "seq_scan",
+					}).Set(table.SecScan)
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+						"scan":  "idx_scan",
+					}).Set(table.IdxScan)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
 	return gauge
 }

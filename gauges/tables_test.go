@@ -24,3 +24,12 @@ func TestTableUsage(t *testing.T) {
 	assert.True(len(metrics) > 0)
 	assertNoErrs(t, gauges)
 }
+
+func TestTableScans(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.TableScans())
+	assert.True(len(metrics) > 0)
+	assertNoErrs(t, gauges)
+}
