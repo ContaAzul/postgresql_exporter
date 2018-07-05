@@ -228,7 +228,7 @@ var tableSecScansQuery = `
 	select relname, seq_scan from pg_stat_user_tables
 `
 
-type tableSecScans struct {
+type tableScans struct {
 	Name    string  `db:"relname"`
 	SecScan float64 `db:"seq_scan"`
 	IdxScan float64 `db:"seq_scan"`
@@ -245,7 +245,7 @@ func (g *Gauges) TableScans() *prometheus.GaugeVec {
 	)
 	go func() {
 		for {
-			var tables []tableSecScans
+			var tables []tableScans
 			if err := g.query(tableSecScansQuery, &tables, emptyParams); err == nil {
 				for _, table := range tables {
 					gauge.With(prometheus.Labels{
