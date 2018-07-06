@@ -263,7 +263,7 @@ func (g *Gauges) TableScans() *prometheus.GaugeVec {
 
 var hotUpdatesQuery = `
 SELECT relname
-	 , coalesce(n_tup_hot_upd, 0) 
+	 , coalesce(n_tup_hot_upd, 0) as n_tup_hot_upd
   FROM pg_stat_user_tables
 `
 
