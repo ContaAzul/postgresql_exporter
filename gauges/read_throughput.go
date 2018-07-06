@@ -8,7 +8,7 @@ import (
 
 var databaseReadingUsageQuery = `
 	SELECT coalesce(tup_returned, 0) as tup_returned
-		 , coalesce(tup_fetched, 0) as tup_returned
+		 , coalesce(tup_fetched, 0) as tup_fetched
 	  FROM pg_stat_database 
 	 WHERE datname = current_database()
 `
