@@ -260,3 +260,40 @@ func (g *Gauges) TableScans() *prometheus.GaugeVec {
 
 	return gauge
 }
+
+var hotUpdatesQuery = `
+SELECT relname
+	 , coalesce(n_tup_hot_upd, 0) as n_tup_hot_upd
+  FROM pg_stat_user_tables
+`
+
+type tableHotUpdates struct {
+	Name       string  `db:"relname"`
+	HotUpdates float64 `db:"n_tup_hot_upd"`
+}
+
+func (g *Gauges) HOTUpdates() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_hot_updates",
+			Help:        "Number of rows Heap-Only tuple updated",
+			ConstLabels: g.labels,
+		},
+		[]string{"table"},
+	)
+	go func() {
+		for {
+			var tables []tableHotUpdates
+			if err := g.query(hotUpdatesQuery, &tables, emptyParams); err == nil {
+				for _, table := range tables {
+					gauge.With(prometheus.Labels{
+						"table": table.Name,
+					}).Set(table.HotUpdates)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
+}

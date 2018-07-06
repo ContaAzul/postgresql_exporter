@@ -33,3 +33,12 @@ func TestTableScans(t *testing.T) {
 	assert.True(len(metrics) > 0)
 	assertNoErrs(t, gauges)
 }
+
+func TestHOTUpdates(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.HOTUpdates())
+	assert.True(len(metrics) > 0)
+	assertNoErrs(t, gauges)
+}
