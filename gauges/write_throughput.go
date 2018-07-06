@@ -24,7 +24,7 @@ func (g *Gauges) DatabaseWritingUsage() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_database_writing_usage",
-			Help:        "Database writing usage statistics",
+			Help:        "Number of inserted, updated and deleted rows per database",
 			ConstLabels: g.labels,
 		},
 		[]string{"stat"},
