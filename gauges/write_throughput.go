@@ -7,9 +7,9 @@ import (
 )
 
 var databaseWritingUsageQuery = `
-	SELECT tup_inserted
-		 , tup_updated
-		 , tup_deleted 
+	SELECT coalesce(tup_inserted, 0) as tup_inserted
+		 , coalesce(tup_updated, 0) as tup_updated
+		 , coalesce(tup_deleted, 0) as tup_deleted
 	  FROM pg_stat_database 
 	 WHERE datname = current_database()
 `
