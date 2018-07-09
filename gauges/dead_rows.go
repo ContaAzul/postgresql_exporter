@@ -8,7 +8,7 @@ import (
 
 var tableDeadRowsQuery = `
 	SELECT relname
-		 , coalesce(n_dead_tup, 0)::float as n_dead_tup
+	     , coalesce(n_dead_tup, 0) as n_dead_tup
 	  FROM pg_stat_user_tables
 `
 
@@ -43,7 +43,7 @@ func (g *Gauges) TableDeadRows() *prometheus.GaugeVec {
 }
 
 var databaseDeadRowsQuery = `
-	SELECT sum(coalesce(n_dead_tup, 0))::float as n_dead_tup
+	SELECT sum(coalesce(n_dead_tup, 0)) as n_dead_tup
 	  FROM pg_stat_user_tables
 `
 
