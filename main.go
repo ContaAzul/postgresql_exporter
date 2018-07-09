@@ -107,5 +107,7 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.DatabaseReadingUsage())
 	reg.MustRegister(gauges.DatabaseWritingUsage())
 	reg.MustRegister(gauges.HOTUpdates())
+	reg.MustRegister(gauges.TableDeadRows())
+	reg.MustRegister(gauges.DatabaseDeadRows())
 
 }
