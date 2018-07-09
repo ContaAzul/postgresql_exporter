@@ -2,6 +2,8 @@ dist: trusty
 sudo: required
 language: go
 go: "1.10"
+addons:
+  postgresql: "9.6"
 services:
   - docker
   - postgresql
