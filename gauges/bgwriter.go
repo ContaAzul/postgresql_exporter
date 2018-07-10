@@ -1,6 +1,10 @@
 package gauges
 
-import "github.com/prometheus/client_golang/prometheus"
+import (
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
 
 // RequestedCheckpoints returns the number of requested checkpoints that have been performed
 func (g *Gauges) RequestedCheckpoints() prometheus.Gauge {
@@ -39,38 +43,51 @@ func (g *Gauges) BuffersMaxWrittenClean() prometheus.Gauge {
 	)
 }
 
-// BuffersWrittenByCheckpoints returns the number of buffers written during checkpoints
-func (g *Gauges) BuffersWrittenByCheckpoints() prometheus.Gauge {
-	return g.new(
-		prometheus.GaugeOpts{
-			Name:        "postgresql_buffers_checkpoint",
-			Help:        "Number of buffers written during checkpoints",
-			ConstLabels: g.labels,
-		},
-		"SELECT buffers_checkpoint FROM pg_stat_bgwriter",
-	)
+type buffersWritten struct {
+	checkpoint float64 `db:"buffers_checkpoint"`
+	bgWriter   float64 `db:"buffers_clean"`
+	backend    float64 `db:"buffers_backend"`
 }
 
-// BuffersWrittenByBgWriter returns the number of buffers written by the background writer
-func (g *Gauges) BuffersWrittenByBgWriter() prometheus.Gauge {
-	return g.new(
-		prometheus.GaugeOpts{
-			Name:        "postgresql_buffers_clean",
-			Help:        "Number of buffers written by the background writer",
-			ConstLabels: g.labels,
-		},
-		"SELECT buffers_clean FROM pg_stat_bgwriter",
-	)
-}
+var buffersWrittenQuery = `
+	SELECT 
+	  buffers_checkpoint,
+	  buffers_clean,
+	  buffers_backend
+	FROM pg_stat_bgwriter
+`
 
-// BuffersWrittenByBackend returns the number of buffers written directly by a backend
-func (g *Gauges) BuffersWrittenByBackend() prometheus.Gauge {
-	return g.new(
+// BuffersWritten returns the number of buffers written directly by a backend,
+// by the background writer and during checkpoints
+func (g *Gauges) BuffersWritten() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_buffers_backend",
-			Help:        "Number of buffers written directly by a backend",
+			Name:        "postgresql_buffers_written",
+			Help:        "table scans statistics",
 			ConstLabels: g.labels,
 		},
-		"SELECT buffers_backend FROM pg_stat_bgwriter",
+		[]string{"written_by"},
 	)
+
+	go func() {
+		for {
+			var buffersWritten []buffersWritten
+			if err := g.query(buffersWrittenQuery, &buffersWritten, emptyParams); err == nil {
+				for _, writtenBy := range buffersWritten {
+					gauge.With(prometheus.Labels{
+						"written_by": "checkpoint",
+					}).Set(writtenBy.checkpoint)
+					gauge.With(prometheus.Labels{
+						"written_by": "bgwriter",
+					}).Set(writtenBy.bgWriter)
+					gauge.With(prometheus.Labels{
+						"written_by": "backend",
+					}).Set(writtenBy.backend)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
 }
