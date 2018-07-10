@@ -42,8 +42,8 @@ func TestBuffersWritten(t *testing.T) {
 	defer close()
 	var metrics = evaluate(t, gauges.BuffersWritten())
 	assert.Len(metrics, 3)
-	assertGreaterThan(t, -1, metrics[0])
-	assertGreaterThan(t, -1, metrics[1])
-	assertGreaterThan(t, -1, metrics[2])
+	for _, metric := range metrics {
+		assertGreaterThan(t, -1, metric)
+	}
 	assertNoErrs(t, gauges)
 }
