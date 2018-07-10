@@ -8,7 +8,9 @@ import (
 
 func TestTableDeadRows(t *testing.T) {
 	var assert = assert.New(t)
-	_, gauges, close := prepare(t)
+	db, gauges, close := prepare(t)
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS deadrowstable(id bigint)")
+	assert.NoError(err)
 	defer close()
 	var metrics = evaluate(t, gauges.TableDeadRows())
 	assert.True(len(metrics) > 0)
@@ -17,7 +19,9 @@ func TestTableDeadRows(t *testing.T) {
 
 func TestDatabaseDeadRows(t *testing.T) {
 	var assert = assert.New(t)
-	_, gauges, close := prepare(t)
+	db, gauges, close := prepare(t)
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS deadrowstable(id bigint)")
+	assert.NoError(err)
 	defer close()
 	var metrics = evaluate(t, gauges.DatabaseDeadRows())
 	assert.True(len(metrics) > 0)
