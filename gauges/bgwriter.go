@@ -44,13 +44,13 @@ func (g *Gauges) BuffersMaxWrittenClean() prometheus.Gauge {
 }
 
 type buffersWritten struct {
-	checkpoint float64 `db:"buffers_checkpoint"`
-	bgWriter   float64 `db:"buffers_clean"`
-	backend    float64 `db:"buffers_backend"`
+	Checkpoint float64 `db:"buffers_checkpoint"`
+	BgWriter   float64 `db:"buffers_clean"`
+	Backend    float64 `db:"buffers_backend"`
 }
 
 var buffersWrittenQuery = `
-	SELECT 
+	SELECT
 	  buffers_checkpoint,
 	  buffers_clean,
 	  buffers_backend
@@ -76,13 +76,13 @@ func (g *Gauges) BuffersWritten() *prometheus.GaugeVec {
 				for _, writtenBy := range buffersWritten {
 					gauge.With(prometheus.Labels{
 						"written_by": "checkpoint",
-					}).Set(writtenBy.checkpoint)
+					}).Set(writtenBy.Checkpoint)
 					gauge.With(prometheus.Labels{
 						"written_by": "bgwriter",
-					}).Set(writtenBy.bgWriter)
+					}).Set(writtenBy.BgWriter)
 					gauge.With(prometheus.Labels{
 						"written_by": "backend",
-					}).Set(writtenBy.backend)
+					}).Set(writtenBy.Backend)
 				}
 			}
 			time.Sleep(g.interval)
