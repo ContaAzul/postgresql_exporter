@@ -63,7 +63,7 @@ func (g *Gauges) BuffersWritten() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_buffers_written",
-			Help:        "table scans statistics",
+			Help:        "Number of buffers written directly by a backend, by the background writer and during checkpoints",
 			ConstLabels: g.labels,
 		},
 		[]string{"written_by"},
