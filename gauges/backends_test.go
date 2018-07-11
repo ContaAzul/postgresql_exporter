@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBackends(t *testing.T) {
+func TestConnectedBackends(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.Backends())
+	var metrics = evaluate(t, gauges.ConnectedBackends())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, 0, metrics[0])
 	assertNoErrs(t, gauges)

@@ -8,18 +8,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func (g *Gauges) Backends() prometheus.Gauge {
+// ConnectedBackends returns the number of backends currently connected to database
+func (g *Gauges) ConnectedBackends() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_backends_total",
-			Help:        "Total database backends",
+			Help:        "Number of backends currently connected to database",
 			ConstLabels: g.labels,
 		},
-		`
-			SELECT numbackends
-			FROM pg_stat_database
-			WHERE datname = current_database()
-		`,
+		"SELECT numbackends FROM pg_stat_database WHERE datname = current_database()",
 	)
 }
 
