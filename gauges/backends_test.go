@@ -37,3 +37,15 @@ func TestBackendsByState(t *testing.T) {
 	}
 	assertNoErrs(t, gauges)
 }
+
+func BackendsByWaitEventType(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.BackendsByWaitEventType())
+	assert.True(len(metrics) > 0)
+	for _, m := range metrics {
+		assertGreaterThan(t, 0, m)
+	}
+	assertNoErrs(t, gauges)
+}

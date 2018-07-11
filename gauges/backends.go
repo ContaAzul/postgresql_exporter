@@ -3,6 +3,7 @@ package gauges
 import (
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -60,6 +61,61 @@ func (g *Gauges) BackendsByState() *prometheus.GaugeVec {
 				for _, row := range backendsByState {
 					gauge.With(prometheus.Labels{
 						"state": row.State,
+					}).Set(row.Total)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+	return gauge
+}
+
+type backendsByWaitEventType struct {
+	Total         float64 `db:"total"`
+	WaitEventType string  `db:"wait_event_type"`
+}
+
+func (g *Gauges) backendsByWaitEventTypeQuery() string {
+	if postgres.Version(g.version()).Is96Or10() {
+		return `
+			SELECT
+			  COUNT(*) AS total,
+			  wait_event_type
+			FROM pg_stat_activity
+			WHERE wait_event_type IS NOT NULL
+			  AND datname = current_database()
+			GROUP BY wait_event_type
+		`
+	}
+	return `
+		SELECT
+		  COUNT(*) as total,
+		  'Lock' as wait_event_type
+		FROM pg_stat_activity
+		WHERE datname = current_database()
+		  AND waiting is true
+	`
+}
+
+// BackendsByWaitEventType returns the number of backends currently waiting on some event
+func (g *Gauges) BackendsByWaitEventType() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_backends_waiting_on_lock_total",
+			Help:        "Number of backends currently waiting on some event",
+			ConstLabels: g.labels,
+		},
+		[]string{"wait_event_type"},
+	)
+
+	go func() {
+		for {
+			var backendsByWaitEventType []backendsByWaitEventType
+			if err := g.query(g.backendsByWaitEventTypeQuery(),
+				&backendsByWaitEventType, emptyParams); err == nil {
+				for _, row := range backendsByWaitEventType {
+					gauge.With(prometheus.Labels{
+						"wait_event_type": row.WaitEventType,
 					}).Set(row.Total)
 				}
 			}
