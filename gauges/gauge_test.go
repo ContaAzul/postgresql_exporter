@@ -84,6 +84,16 @@ func connect(t *testing.T) *sql.DB {
 	return db
 }
 
+func createTestTable(t *testing.T, db *sql.DB) func() {
+	var assert = assert.New(t)
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS testtable(id bigint)")
+	assert.NoError(err)
+	return func() {
+		_, err := db.Exec("DROP TABLE IF EXISTS testtable")
+		assert.NoError(err)
+	}
+}
+
 func TestVersion(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
