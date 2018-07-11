@@ -23,7 +23,7 @@ func (v Version) LastWalReceivedLsnFunctionName() string {
 	return "pg_last_xlog_receive_location"
 }
 
-// WalLsnDiffFunctionName returns the name of the function that returns  the difference between two write-ahead
+// WalLsnDiffFunctionName returns the name of the function that returns the difference between two write-ahead
 // log locations
 func (v Version) WalLsnDiffFunctionName() string {
 	if v.is10() {
