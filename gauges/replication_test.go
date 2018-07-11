@@ -16,11 +16,21 @@ func TestReplicationStatus(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestReplicationLag(t *testing.T) {
+func TestReplicationDelay(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.ReplicationLag())
+	var metrics = evaluate(t, gauges.ReplicationDelayInSeconds())
+	assert.Len(metrics, 1)
+	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
+}
+
+func TestReplicationDelayInBytes(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.ReplicationDelayInBytes())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 	assertNoErrs(t, gauges)
