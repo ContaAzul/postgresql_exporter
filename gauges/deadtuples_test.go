@@ -15,7 +15,7 @@ func TestDeadTuples(t *testing.T) {
 	_, err = db.Exec("CREATE EXTENSION IF NOT EXISTS pgstattuple")
 	assert.NoError(err)
 	var metrics = evaluate(t, gauges.DeadTuples())
-	assert.Len(metrics, 1)
+	assert.True(len(metrics) > 0)
 	for _, m := range metrics {
 		assert.Equal(0.0, m.Value)
 	}
