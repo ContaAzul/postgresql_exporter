@@ -26,11 +26,11 @@ func TestMaxBackends(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestBackendsStatus(t *testing.T) {
+func TestBackendsByState(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.BackendsStatus())
+	var metrics = evaluate(t, gauges.BackendsByState())
 	assert.True(len(metrics) > 0)
 	for _, m := range metrics {
 		assertGreaterThan(t, 0, m)
