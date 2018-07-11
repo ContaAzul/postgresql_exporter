@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDeadTuples(t *testing.T) {
@@ -14,7 +15,7 @@ func TestDeadTuples(t *testing.T) {
 	defer dropTestTable()
 
 	_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS pgstattuple")
-	assert.NoError(err)
+	require.NoError(t, err)
 
 	var metrics = evaluate(t, gauges.DeadTuples())
 	assert.True(len(metrics) > 0)
@@ -32,7 +33,7 @@ func TestDeadTuplesWithoutPgstatTuple(t *testing.T) {
 	defer dropTestTable()
 
 	_, err := db.Exec("DROP EXTENSION IF EXISTS pgstattuple")
-	assert.NoError(err)
+	require.NoError(t, err)
 
 	var metrics = evaluate(t, gauges.DeadTuples())
 	assert.Len(metrics, 0)
