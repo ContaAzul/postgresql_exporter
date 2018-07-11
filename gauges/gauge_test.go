@@ -9,6 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type Metric struct {
@@ -21,12 +22,12 @@ var labels = prometheus.Labels{
 }
 
 func evaluate(t *testing.T, c prometheus.Collector) (result []Metric) {
-	var assert = assert.New(t)
+	var require = require.New(t)
 	var reg = prometheus.NewRegistry()
-	assert.NoError(reg.Register(c))
+	require.NoError(reg.Register(c))
 	time.Sleep(100 * time.Millisecond)
 	metrics, err := reg.Gather()
-	assert.NoError(err)
+	require.NoError(err)
 	for _, metric := range metrics {
 		for _, m := range metric.GetMetric() {
 			result = append(
@@ -72,25 +73,24 @@ func prepare(t *testing.T) (*sql.DB, *Gauges, func()) {
 }
 
 func connect(t *testing.T) *sql.DB {
-	var assert = assert.New(t)
+	var require = require.New(t)
 	var url = os.Getenv("TEST_DATABASE_URL")
 	if url == "" {
 		url = "postgres://localhost:5432/postgres?sslmode=disable"
 	}
 	db, err := sql.Open("postgres", url)
-	assert.NoError(err, "failed to open connection to the database")
-	assert.NoError(db.Ping(), "failed to ping database")
+	require.NoError(err, "failed to open connection to the database")
+	require.NoError(db.Ping(), "failed to ping database")
 	db.SetMaxOpenConns(1)
 	return db
 }
 
 func createTestTable(t *testing.T, db *sql.DB) func() {
-	var assert = assert.New(t)
 	_, err := db.Exec("CREATE TABLE IF NOT EXISTS testtable(id bigint)")
-	assert.NoError(err)
+	require.NoError(t, err)
 	return func() {
 		_, err := db.Exec("DROP TABLE IF EXISTS testtable")
-		assert.NoError(err)
+		assert.New(t).NoError(err)
 	}
 }
 

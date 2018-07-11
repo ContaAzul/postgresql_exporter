@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestSlowestQueries(t *testing.T) {
@@ -15,9 +16,9 @@ func TestSlowestQueries(t *testing.T) {
 		return
 	}
 	_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
-	assert.NoError(err)
+	require.NoError(t, err)
 	_, err = db.Exec("CREATE TABLE IF NOT EXISTS slowest_queries AS SELECT generate_series(1, 200) AS id, md5(random()::text) AS desc")
-	assert.NoError(err)
+	require.NoError(t, err)
 	defer func() {
 		_, err := db.Exec("DROP TABLE IF EXISTS slowest_queries")
 		assert.NoError(err)
@@ -42,7 +43,7 @@ func TestSlowestQueriesExtensionNotInstalled(t *testing.T) {
 		return
 	}
 	_, err := db.Exec("DROP EXTENSION IF EXISTS pg_stat_statements")
-	assert.NoError(err)
+	require.NoError(t, err)
 
 	var metrics = evaluate(t, gauges.SlowestQueries())
 	assert.Len(metrics, 0)
