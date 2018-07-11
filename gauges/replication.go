@@ -53,10 +53,10 @@ func (g *Gauges) StreamingWALs() prometheus.Gauge {
 
 // ReplicationDelay returns a prometheus gauge for the database replication
 // lag in seconds
-func (g *Gauges) ReplicationDelay() prometheus.Gauge {
+func (g *Gauges) ReplicationDelayInSeconds() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_replication_delay",
+			Name:        "postgresql_replication_delay_seconds",
 			Help:        "Dabatase replication delay in seconds",
 			ConstLabels: g.labels,
 		},
@@ -71,7 +71,7 @@ func (g *Gauges) ReplicationDelayInBytes() prometheus.Gauge {
 
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_replication_delay_in_bytes",
+			Name:        "postgresql_replication_delay_bytes",
 			Help:        "Dabatase replication delay in bytes",
 			ConstLabels: g.labels,
 		},
