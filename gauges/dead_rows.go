@@ -17,6 +17,7 @@ type tableDeadRows struct {
 	DeadTuples float64 `db:"n_dead_tup"`
 }
 
+// TableDeadRows returns the estimated number of dead rows of a given table
 func (g *Gauges) TableDeadRows() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -47,6 +48,7 @@ var databaseDeadRowsQuery = `
 	  FROM pg_stat_user_tables
 `
 
+// DatabaseDeadRows returns the sum of estimated number of dead rows of all tables in a database
 func (g *Gauges) DatabaseDeadRows() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
