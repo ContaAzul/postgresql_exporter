@@ -101,7 +101,7 @@ func (g *Gauges) backendsByWaitEventTypeQuery() string {
 func (g *Gauges) BackendsByWaitEventType() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_backends_waiting_on_lock_total",
+			Name:        "postgresql_backends_by_wait_event_type_total",
 			Help:        "Number of backends currently waiting on some event",
 			ConstLabels: g.labels,
 		},
