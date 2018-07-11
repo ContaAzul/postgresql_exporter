@@ -23,6 +23,15 @@ func (v Version) LastWalReceivedLsnFunctionName() string {
 	return "pg_last_xlog_receive_location"
 }
 
+// WalLsnDiffFunctionName returns the name of the function that returns the difference between two write-ahead
+// log locations
+func (v Version) WalLsnDiffFunctionName() string {
+	if v.is10() {
+		return "pg_wal_lsn_diff"
+	}
+	return "pg_xlog_location_diff"
+}
+
 // LastWalReplayedLsnFunctionName returns the name of the function that returns the last write-ahead
 // log location replayed during recovery according to the postgres version
 func (v Version) LastWalReplayedLsnFunctionName() string {
