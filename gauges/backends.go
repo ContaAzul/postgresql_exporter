@@ -20,18 +20,15 @@ func (g *Gauges) ConnectedBackends() prometheus.Gauge {
 	)
 }
 
+// MaxBackends returns the maximum number of concurrent connections in the database
 func (g *Gauges) MaxBackends() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_max_backends",
-			Help:        "Maximum database backends (per postmaster)",
+			Help:        "Maximum number of concurrent connections in the database",
 			ConstLabels: g.labels,
 		},
-		`
-			SELECT setting::numeric
-			FROM pg_settings
-			WHERE name = 'max_connections'
-		`,
+		"SELECT setting::numeric FROM pg_settings WHERE name = 'max_connections'",
 	)
 }
 
