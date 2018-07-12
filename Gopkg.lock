@@ -95,7 +95,7 @@
   branch = "master"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
-  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
 
 [[projects]]
   branch = "master"
@@ -120,7 +120,10 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = ["assert"]
+  packages = [
+    "assert",
+    "require"
+  ]
   revision = "f35b8ab0b5a2cef36673838d662e249dd9c94686"
   version = "v1.2.2"
 
@@ -133,6 +136,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8f201ed389799670eb7b85c0ec57f03e6a1c7fe751400e9b58070ca404c33ec7"
+  inputs-digest = "a9ca69c5b8826b1a9ccae76b7d4f9bdf2f19a9d7aec87ca4540a55dceff8d3e6"
   solver-name = "gps-cdcl"
   solver-version = 1
