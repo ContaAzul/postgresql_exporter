@@ -17,6 +17,10 @@ archive:
   name_template: '{{ .Binary }}_{{ .Os }}_{{ .Arch }}'
   files:
   - config.yml
+changelog:
+  filters:
+    exclude:
+    - '^Merge (remote|branch|pull)'
 dockers:
 - image: caninjas/postgresql_exporter
   tag_templates:
