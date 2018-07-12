@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBackends(t *testing.T) {
+func TestConnectedBackends(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.Backends())
+	var metrics = evaluate(t, gauges.ConnectedBackends())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, 0, metrics[0])
 	assertNoErrs(t, gauges)
@@ -26,12 +26,25 @@ func TestMaxBackends(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestBackendsStatus(t *testing.T) {
+func TestBackendsByState(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.BackendsStatus())
+	var metrics = evaluate(t, gauges.BackendsByState())
 	assert.True(len(metrics) > 0)
+	for _, m := range metrics {
+		assertGreaterThan(t, 0, m)
+	}
+	assertNoErrs(t, gauges)
+}
+
+// TODO: somehow set a waiting connections to proper test this
+func TestBackendsByWaitEventType(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.BackendsByWaitEventType())
+	assert.True(len(metrics) >= 0)
 	for _, m := range metrics {
 		assertGreaterThan(t, 0, m)
 	}
