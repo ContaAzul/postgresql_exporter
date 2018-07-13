@@ -111,5 +111,5 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.HOTUpdates())
 	reg.MustRegister(gauges.TableDeadRows())
 	reg.MustRegister(gauges.DatabaseDeadRows())
-
+	reg.MustRegister(gauges.UnvacuumedTransactions())
 }
