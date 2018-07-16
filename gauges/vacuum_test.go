@@ -15,3 +15,29 @@ func TestUnvacuumedTransactions(t *testing.T) {
 	assertGreaterThan(t, 0, metrics[0])
 	assertNoErrs(t, gauges)
 }
+
+func TestLastTimeVacuumRan(t *testing.T) {
+	var assert = assert.New(t)
+	db, gauges, close := prepare(t)
+	defer close()
+	dropTestTable := createTestTable(t, db)
+	defer dropTestTable()
+
+	var metrics = evaluate(t, gauges.LastTimeVacuumRan())
+	assert.Len(metrics, 1)
+	assertEqual(t, 0, metrics[0])
+	assertNoErrs(t, gauges)
+}
+
+func TestLastTimeAutoVacuumRan(t *testing.T) {
+	var assert = assert.New(t)
+	db, gauges, close := prepare(t)
+	defer close()
+	dropTestTable := createTestTable(t, db)
+	defer dropTestTable()
+
+	var metrics = evaluate(t, gauges.LastTimeAutoVacuumRan())
+	assert.Len(metrics, 1)
+	assertEqual(t, 0, metrics[0])
+	assertNoErrs(t, gauges)
+}
