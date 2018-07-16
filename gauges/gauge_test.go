@@ -64,6 +64,15 @@ func assertGreaterThan(t *testing.T, expected float64, m Metric) {
 	)
 }
 
+func assertEqual(t *testing.T, expected float64, m Metric) {
+	var assert = assert.New(t)
+	assert.Equal(
+		expected,
+		m.Value,
+		"%s should be equal to %v: %v", m.Name, expected, m.Value,
+	)
+}
+
 func prepare(t *testing.T) (*sql.DB, *Gauges, func()) {
 	var db = connect(t)
 	var gauges = New("test", db, 1*time.Minute, 1*time.Second)
