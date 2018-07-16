@@ -10,10 +10,10 @@ const tableSizesQuery = `
 	SELECT
 		ut.relname AS table_name,
 		pg_indexes_size(c.oid) AS index_size,
-		pg_total_relation_size(c.reltoastrelid) AS toast_size,
+		COALESCE(pg_total_relation_size(c.reltoastrelid), 0) AS toast_size,
 		pg_total_relation_size(c.oid)
 			- pg_indexes_size(c.oid)
-			- COALESCE(pg_total_relation_size(c.reltoastrelid), 0) AS table_size,
+			- COALESCE(pg_total_relation_size(c.reltoastrelid), 0) AS table_size
 	FROM
 		pg_stat_user_tables ut
 		JOIN pg_class c on ut.relname = c.relname
