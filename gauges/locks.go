@@ -6,24 +6,24 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type lockCountWithMode struct {
+type locks struct {
 	Mode  string  `db:"mode"`
 	Count float64 `db:"count"`
 }
 
-// Locks returns the number of locks by mode
+// Locks returns the number of active locks on the database by mode
 func (g *Gauges) Locks() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_lock_count",
-			Help:        "Number of locks by mode",
+			Name:        "postgresql_locks_total",
+			Help:        "Number of active locks on the database by mode",
 			ConstLabels: g.labels,
 		},
 		[]string{"mode"},
 	)
 	go func() {
 		for {
-			var locks []lockCountWithMode
+			var locks []locks
 			if err := g.query(
 				`
 					SELECT mode, count(*) as count
@@ -49,12 +49,12 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 	return gauge
 }
 
-// NotGrantedLocks returns the number of not granted locks
+// NotGrantedLocks returns the number of not granted locks on the database
 func (g *Gauges) NotGrantedLocks() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_not_granted_locks",
-			Help:        "Number of not granted locks",
+			Name:        "postgresql_not_granted_locks_total",
+			Help:        "Number of not granted locks on the database",
 			ConstLabels: g.labels,
 		},
 		`
