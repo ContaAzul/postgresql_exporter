@@ -53,3 +53,51 @@ func (g *Gauges) DatabaseDeadRows() prometheus.Gauge {
 		"SELECT sum(coalesce(n_dead_tup, 0)) as n_dead_tup FROM pg_stat_user_tables",
 	)
 }
+
+type tableLiveRows struct {
+	Table      string  `db:"relname"`
+	LiveTuples float64 `db:"n_live_tup"`
+}
+
+// TableLiveRows returns the estimated number of live rows of a given table
+func (g *Gauges) TableLiveRows() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_table_live_rows",
+			Help:        "Estimated number of live rows in table",
+			ConstLabels: g.labels,
+		},
+		[]string{"table"},
+	)
+
+	const tableLiveRowsQuery = `
+		SELECT relname, coalesce(n_live_tup, 0) as n_live_tup FROM pg_stat_user_tables
+	`
+
+	go func() {
+		for {
+			var tableLiveRows []tableLiveRows
+			if err := g.query(tableLiveRowsQuery, &tableLiveRows, emptyParams); err == nil {
+				for _, table := range tableLiveRows {
+					gauge.With(prometheus.Labels{
+						"table": table.Table,
+					}).Set(table.LiveTuples)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+	return gauge
+}
+
+// DatabaseLiveRows returns the sum of estimated number of live rows of all tables in a database
+func (g *Gauges) DatabaseLiveRows() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_database_live_rows",
+			Help:        "Estimated number of live rows in database",
+			ConstLabels: g.labels,
+		},
+		"SELECT sum(coalesce(n_live_tup, 0)) as n_live_tup FROM pg_stat_user_tables",
+	)
+}
