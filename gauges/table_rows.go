@@ -6,12 +6,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var tableDeadRowsQuery = `
-	SELECT relname
-	     , coalesce(n_dead_tup, 0) as n_dead_tup
-	  FROM pg_stat_user_tables
-`
-
 type tableDeadRows struct {
 	Table      string  `db:"relname"`
 	DeadTuples float64 `db:"n_dead_tup"`
@@ -22,11 +16,16 @@ func (g *Gauges) TableDeadRows() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_table_dead_rows",
-			Help:        "Number of dead rows in table",
+			Help:        "Estimated number of dead rows in table",
 			ConstLabels: g.labels,
 		},
 		[]string{"table"},
 	)
+
+	const tableDeadRowsQuery = `
+		SELECT relname, coalesce(n_dead_tup, 0) as n_dead_tup FROM pg_stat_user_tables
+	`
+
 	go func() {
 		for {
 			var tableDeadRows []tableDeadRows
@@ -43,17 +42,14 @@ func (g *Gauges) TableDeadRows() *prometheus.GaugeVec {
 	return gauge
 }
 
-var databaseDeadRowsQuery = `
-	SELECT sum(coalesce(n_dead_tup, 0)) as n_dead_tup
-	  FROM pg_stat_user_tables
-`
-
 // DatabaseDeadRows returns the sum of estimated number of dead rows of all tables in a database
 func (g *Gauges) DatabaseDeadRows() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_database_dead_rows",
-			Help:        "Number of dead rows in database",
+			Help:        "Estimated number of dead rows in database",
 			ConstLabels: g.labels,
-		}, databaseDeadRowsQuery)
+		},
+		"SELECT sum(coalesce(n_dead_tup, 0)) as n_dead_tup FROM pg_stat_user_tables",
+	)
 }
