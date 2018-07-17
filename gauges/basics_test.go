@@ -26,16 +26,6 @@ func TestSize(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestDeadlocks(t *testing.T) {
-	var assert = assert.New(t)
-	_, gauges, close := prepare(t)
-	defer close()
-	var metrics = evaluate(t, gauges.Deadlocks())
-	assert.Len(metrics, 1)
-	assertGreaterThan(t, -1, metrics[0])
-	assertNoErrs(t, gauges)
-}
-
 func TestTempSize(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
