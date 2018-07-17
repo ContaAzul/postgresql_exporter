@@ -91,6 +91,7 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.IndexBlocksRead())
 	reg.MustRegister(gauges.Locks())
 	reg.MustRegister(gauges.NotGrantedLocks())
+	reg.MustRegister(gauges.DeadLocks())
 	reg.MustRegister(gauges.ReplicationDelayInSeconds())
 	reg.MustRegister(gauges.ReplicationDelayInBytes())
 	reg.MustRegister(gauges.ReplicationStatus())
