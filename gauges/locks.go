@@ -69,3 +69,15 @@ func (g *Gauges) NotGrantedLocks() prometheus.Gauge {
 		`,
 	)
 }
+
+// DeadLocks returns the number of deadlocks detected on the database
+func (g *Gauges) DeadLocks() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_deadlocks_total",
+			Help:        "Number of deadlocks detected on the database",
+			ConstLabels: g.labels,
+		},
+		"SELECT deadlocks FROM pg_stat_database WHERE datname = current_database()",
+	)
+}
