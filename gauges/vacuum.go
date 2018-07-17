@@ -3,6 +3,8 @@ package gauges
 import (
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
+	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -93,4 +95,26 @@ func (g *Gauges) LastTimeAutoVacuumRan() *prometheus.GaugeVec {
 	}()
 
 	return gauge
+}
+
+// VacuumRunningTotal returns the number of backends (including autovacuum worker processes)
+// that is currently running a vacuuming (not include VACUUM FULL).
+//
+// This metric is only supported for PostgreSQL 9.6 or newer versions
+func (g *Gauges) VacuumRunningTotal() prometheus.Gauge {
+	var gaugeOpts = prometheus.GaugeOpts{
+		Name:        "postgresql_vacuum_running_total",
+		Help:        "Number of backends (including autovacuum worker processes) that is currently vacuuming",
+		ConstLabels: g.labels,
+	}
+
+	const vacuumRunningQuery = `
+		SELECT COUNT(*) FROM pg_stat_progress_vacuum WHERE datname = current_database()
+	`
+
+	if !postgres.Version(g.version()).Is96Or10() {
+		log.Warn("postgresql_vacuum_running_total disabled because it's only supported for PostgreSQL 9.6 or newer versions")
+		return prometheus.NewGauge(gaugeOpts)
+	}
+	return g.new(gaugeOpts, vacuumRunningQuery)
 }

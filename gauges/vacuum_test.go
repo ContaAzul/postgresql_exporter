@@ -41,3 +41,14 @@ func TestLastTimeAutoVacuumRan(t *testing.T) {
 	assertEqual(t, 0, metrics[0])
 	assertNoErrs(t, gauges)
 }
+
+func TestVacuumRunningTotal(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+
+	var metrics = evaluate(t, gauges.VacuumRunningTotal())
+	assert.Len(metrics, 1)
+	assertEqual(t, 0, metrics[0])
+	assertNoErrs(t, gauges)
+}
