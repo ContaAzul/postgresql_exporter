@@ -12,8 +12,8 @@ type indexScans struct {
 	IdxScan float64 `db:"idx_scan"`
 }
 
-// IndexesScans returns the number of index scans initiated on a index
-func (g *Gauges) IndexesScans() *prometheus.GaugeVec {
+// IndexScans returns the number of index scans initiated on a index
+func (g *Gauges) IndexScans() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_indexes_scans_total",
@@ -23,12 +23,12 @@ func (g *Gauges) IndexesScans() *prometheus.GaugeVec {
 		[]string{"table", "index"},
 	)
 
-	const indexesScansQuery = "SELECT relname, indexrelname, idx_scan FROM pg_stat_user_indexes"
+	const indexScansQuery = "SELECT relname, indexrelname, idx_scan FROM pg_stat_user_indexes"
 
 	go func() {
 		for {
 			var indexes []indexScans
-			if err := g.query(indexesScansQuery, &indexes, emptyParams); err == nil {
+			if err := g.query(indexScansQuery, &indexes, emptyParams); err == nil {
 				for _, index := range indexes {
 					gauge.With(prometheus.Labels{
 						"table": index.Table,
