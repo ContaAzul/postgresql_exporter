@@ -11,7 +11,7 @@ You can add as many database connections as you like to the
 ./postgresql_exporter -config=my/config.yml
 ```
 
-Some stats are hidden from normal database users, so you must grant acess to that:
+By default some stat views like pg_stat_statements and pg_stat_activity doesn't allow viewing queries run by other users, unless you are a database superuser. Since you probably don't want monitoring to run as a superuser, you can setup, in a AWS RDS instance, a separate monitoring user like this:
 
 ```sql
 GRANT pg_monitor TO my_monitor_user;
