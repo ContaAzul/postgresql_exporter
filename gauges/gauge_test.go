@@ -95,7 +95,7 @@ func connect(t *testing.T) *sql.DB {
 }
 
 func createTestTable(t *testing.T, db *sql.DB) func() {
-	_, err := db.Exec("CREATE TABLE IF NOT EXISTS testtable(id bigint)")
+	_, err := db.Exec("CREATE TABLE IF NOT EXISTS testtable(id bigint PRIMARY KEY)")
 	require.NoError(t, err)
 	return func() {
 		_, err := db.Exec("DROP TABLE IF EXISTS testtable")
