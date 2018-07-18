@@ -98,13 +98,13 @@ func (g *Gauges) LastTimeAutoVacuumRan() *prometheus.GaugeVec {
 }
 
 // VacuumRunningTotal returns the number of backends (including autovacuum worker processes)
-// that is currently running a vacuuming (not include VACUUM FULL).
+// that are currently running a vacuuming (not including VACUUM FULL).
 //
 // This metric is only supported for PostgreSQL 9.6 or newer versions
 func (g *Gauges) VacuumRunningTotal() prometheus.Gauge {
 	var gaugeOpts = prometheus.GaugeOpts{
 		Name:        "postgresql_vacuum_running_total",
-		Help:        "Number of backends (including autovacuum worker processes) that is currently vacuuming",
+		Help:        "Number of backends (including autovacuum worker processes) currently vacuuming",
 		ConstLabels: g.labels,
 	}
 
