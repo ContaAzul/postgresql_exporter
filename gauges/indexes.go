@@ -6,6 +6,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// UnusedIndexes returns the count of unused indexes in the database
 func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
@@ -23,31 +24,33 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 	)
 }
 
+// IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
 func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blks_read_sum",
-			Help:        "Sum of the number of disk blocks read from all public indexes",
+			Help:        "Sum of the number of disk blocks read from all user indexes",
 			ConstLabels: g.labels,
 		},
 		`
 			SELECT coalesce(sum(idx_blks_read), 0)
-			FROM pg_statio_all_indexes
+			FROM pg_statio_user_indexes
 			WHERE schemaname = 'public'
 		`,
 	)
 }
 
+// IndexBlocksHit returns the sum of the number of buffer hits on all user indexes
 func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blks_hit_sum",
-			Help:        "Sum of the number of buffer hits on all public indexes",
+			Help:        "Sum of the number of buffer hits on all user indexes",
 			ConstLabels: g.labels,
 		},
 		`
 			SELECT coalesce(sum(idx_blks_hit), 0)
-			FROM pg_statio_all_indexes
+			FROM pg_statio_user_indexes
 			WHERE schemaname = 'public'
 		`,
 	)
@@ -160,11 +163,13 @@ type indexBloat struct {
 	Pct   float64 `db:"bloat_pct"`
 }
 
+// IndexBloat returns bloat percentage of an index reporting only for indexes
+// with size greater than 10mb and bloat lower than 50%
 func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_bloat_pct",
-			Help:        "bloat percentage of an index. reports only for indexes > 10mb and > 50% bloat",
+			Help:        "Bloat percentage of an index. This metric reports only indexes > 10mb and > 50% bloat",
 			ConstLabels: g.labels,
 		},
 		[]string{"index", "table"},
