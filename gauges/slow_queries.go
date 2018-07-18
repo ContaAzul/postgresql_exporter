@@ -28,10 +28,6 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 		},
 		[]string{"query"},
 	)
-	if !g.isSuperuser {
-		log.Warn("postgresql_slowest_queries disabled because it requires a superuser to see queries from other users")
-		return gauge
-	}
 	if !g.hasExtension("pg_stat_statements") {
 		log.Warn("postgresql_slowest_queries disabled because pg_stat_statements extension is not installed")
 		return gauge
