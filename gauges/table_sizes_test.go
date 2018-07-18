@@ -16,7 +16,7 @@ func TestTableSizes(t *testing.T) {
 	var metrics = evaluate(t, gauges.TableSizes())
 	assert.Len(metrics, 3)
 	for _, metric := range metrics {
-		assertEqual(t, 0, metric)
+		assertGreaterThan(t, -1, metric)
 	}
 	assertNoErrs(t, gauges)
 }
