@@ -14,7 +14,7 @@ You can add as many database connections as you like to the
 Some stats are hidden from normal database users, so you must grant acess to that:
 
 ```sql
-GRANT pg_monitor to my_monitor_user;
+GRANT pg_monitor TO my_monitor_user;
 ```
 
 Then you can add hostname:9111 to the prometheus scrapes config:
