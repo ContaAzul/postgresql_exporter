@@ -16,7 +16,7 @@ type indexScans struct {
 func (g *Gauges) IndexScans() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_indexes_scans_total",
+			Name:        "postgresql_index_scans_total",
 			Help:        "Number of index scans initiated on a index",
 			ConstLabels: g.labels,
 		},
