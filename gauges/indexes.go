@@ -6,6 +6,43 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+type indexScans struct {
+	Table   string  `db:"relname"`
+	Index   string  `db:"indexrelname"`
+	IdxScan float64 `db:"idx_scan"`
+}
+
+// IndexesScans returns the number of index scans initiated on a index
+func (g *Gauges) IndexesScans() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_indexes_scans_total",
+			Help:        "Number of index scans initiated on a index",
+			ConstLabels: g.labels,
+		},
+		[]string{"table", "index"},
+	)
+
+	const indexesScansQuery = "SELECT relname, indexrelname, idx_scan FROM pg_stat_user_indexes"
+
+	go func() {
+		for {
+			var indexes []indexScans
+			if err := g.query(indexesScansQuery, &indexes, emptyParams); err == nil {
+				for _, index := range indexes {
+					gauge.With(prometheus.Labels{
+						"table": index.Table,
+						"index": index.Index,
+					}).Set(index.IdxScan)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
+}
+
 // UnusedIndexes returns the count of unused indexes in the database
 func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 	return g.new(
