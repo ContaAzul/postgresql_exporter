@@ -72,7 +72,7 @@ func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 		`
 			SELECT coalesce(sum(idx_blks_read), 0)
 			FROM pg_statio_user_indexes
-			WHERE schemaname = 'public'
+			WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
 		`,
 	)
 }
@@ -88,7 +88,7 @@ func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
 		`
 			SELECT coalesce(sum(idx_blks_hit), 0)
 			FROM pg_statio_user_indexes
-			WHERE schemaname = 'public'
+			WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
 		`,
 	)
 }
