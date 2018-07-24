@@ -62,11 +62,11 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 }
 
 type schemaIndexBlocksRead struct {
-	Name     		string  `db:"schemaname"`
-	IndexBlocksRead	float64 `db:"idx_blks_read"`
+	Name            string  `db:"schemaname"`
+	IndexBlocksRead float64 `db:"idx_blks_read"`
 }
 
-// IndexBlocksReadBySchema returns the sum of the number of disk blocks read from all public indexes
+// IndexBlocksReadBySchema returns the sum of the number of disk blocks read from all user indexes by schema
 func (g *Gauges) IndexBlocksReadBySchema() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -103,13 +103,12 @@ func (g *Gauges) IndexBlocksReadBySchema() *prometheus.GaugeVec {
 	return gauge
 }
 
-
 type schemaIndexBlocksHit struct {
-	Name     		string  `db:"schemaname"`
-	IndexBlocksHit	float64 `db:"idx_blks_hit"`
+	Name           string  `db:"schemaname"`
+	IndexBlocksHit float64 `db:"idx_blks_hit"`
 }
 
-// IndexBlocksHitBySchema returns the sum of the number of buffer hits on all user indexes
+// IndexBlocksHitBySchema returns the sum of the number of buffer hits on all user indexes by schema
 func (g *Gauges) IndexBlocksHitBySchema() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
