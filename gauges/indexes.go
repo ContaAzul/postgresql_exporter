@@ -2,7 +2,6 @@ package gauges
 
 import (
 	"time"
-	"github.com/apex/log"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -91,9 +90,7 @@ func (g *Gauges) IndexBlocksReadBySchema() *prometheus.GaugeVec {
 		for {
 			var schemas []schemaIndexBlocksRead
 			if err := g.query(schemaIndexBlocksReadQuery, &schemas, emptyParams); err == nil {
-				log.WithField("schemas", schemas).Info("started")
 				for _, schema := range schemas {
-					log.Info("*********************************Achou")
 					gauge.With(prometheus.Labels{
 						"schema": schema.Name,
 					}).Set(schema.IndexBlocksRead)
