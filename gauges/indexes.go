@@ -62,7 +62,7 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 }
 
 type schemaIndexBlocksRead struct {
-	Name     string  `db:"schemaname"`
+	Name     		string  `db:"schemaname"`
 	IndexBlocksRead float64 `db:"idx_blks_read"`
 }
 
@@ -105,7 +105,7 @@ func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 
 
 type schemaIndexBlocksHit struct {
-	Name     string  `db:"schemaname"`
+	Name     		string  `db:"schemaname"`
 	IndexBlocksRead float64 `db:"idx_blks_hit"`
 }
 
