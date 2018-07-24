@@ -61,36 +61,89 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 	)
 }
 
+type schemaIndexBlocksRead struct {
+	Name     string  `db:"schemaname"`
+	IndexBlocksRead float64 `db:"idx_blks_read"`
+}
+
 // IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
 func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
-	return g.new(
+	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_index_blks_read_sum",
+			Name:        "postgresql_index_blocks_read_sum",
 			Help:        "Sum of the number of disk blocks read from all user indexes",
 			ConstLabels: g.labels,
 		},
-		`
-			SELECT coalesce(sum(idx_blks_read), 0)
-			FROM pg_statio_user_indexes
-			WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
-		`,
+		[]string{"schema"},
 	)
+
+	const schemaIndexBlocksReadQuery = `
+		SELECT
+			schemaname,
+			coalesce(sum(idx_blks_read), 0) AS idx_blks_read
+		FROM pg_statio_user_indexes
+		WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
+		GROUP BY schemaname;
+	`
+
+	go func() {
+		for {
+			var schemas []schemaIndexBlocksRead
+			if err := g.query(schemaIndexBlocksReadQuery, &schemas, emptyParams); err == nil {
+				for _, schema := range schemas {
+					gauge.With(prometheus.Labels{
+						"table": schema.Name,
+					}).Set(table.IndexBlocksRead)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
+}
+
+
+type schemaIndexBlocksHit struct {
+	Name     string  `db:"schemaname"`
+	IndexBlocksRead float64 `db:"idx_blks_hit"`
 }
 
 // IndexBlocksHit returns the sum of the number of buffer hits on all user indexes
-func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
-	return g.new(
+func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
+	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_index_blks_hit_sum",
+			Name:        "postgresql_index_blocks_hit_sum",
 			Help:        "Sum of the number of buffer hits on all user indexes",
 			ConstLabels: g.labels,
 		},
-		`
-			SELECT coalesce(sum(idx_blks_hit), 0)
-			FROM pg_statio_user_indexes
-			WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
-		`,
+		[]string{"schema"},
 	)
+
+	const schemaIndexBlocksHitQuery = `
+		SELECT
+			schemaname,
+			coalesce(sum(idx_blks_hit), 0) AS idx_blks_hit
+		FROM pg_statio_user_indexes
+		WHERE schemaname NOT IN ('pg_catalog','information_schema','monitoring')
+		GROUP BY schemaname;
+	`
+
+	go func() {
+		for {
+			var schemas []schemaIndexBlocksHit
+			if err := g.query(schemaIndexBlocksHitQuery, &schemas, emptyParams); err == nil {
+				for _, schema := range schemas {
+					gauge.With(prometheus.Labels{
+						"table": schema.Name,
+					}).Set(table.IndexBlocksRead)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+
+	return gauge
 }
 
 const indexBloatQuery = `
