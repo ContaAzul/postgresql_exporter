@@ -67,7 +67,7 @@ type schemaIndexBlocksRead struct {
 }
 
 // IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
-func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
+func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blocks_read_sum",
