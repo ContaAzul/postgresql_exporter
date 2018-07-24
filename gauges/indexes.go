@@ -67,7 +67,7 @@ type schemaIndexBlocksRead struct {
 }
 
 // IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
-func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
+func (g *Gauges) IndexBlocksRead() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blocks_read_sum",
@@ -93,7 +93,7 @@ func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
 				for _, schema := range schemas {
 					gauge.With(prometheus.Labels{
 						"schema": schema.Name,
-					}).Set(table.IndexBlocksRead)
+					}).Set(schema.IndexBlocksRead)
 				}
 			}
 			time.Sleep(g.interval)
@@ -106,11 +106,11 @@ func (g *Gauges) IndexBlocksHit() prometheus.Gauge {
 
 type schemaIndexBlocksHit struct {
 	Name     		string  `db:"schemaname"`
-	IndexBlocksRead float64 `db:"idx_blks_hit"`
+	IndexBlocksHit float64 `db:"idx_blks_hit"`
 }
 
 // IndexBlocksHit returns the sum of the number of buffer hits on all user indexes
-func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
+func (g *Gauges) IndexBlocksHit() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blocks_hit_sum",
@@ -136,7 +136,7 @@ func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 				for _, schema := range schemas {
 					gauge.With(prometheus.Labels{
 						"schema": schema.Name,
-					}).Set(table.IndexBlocksRead)
+					}).Set(schema.IndexBlocksHit)
 				}
 			}
 			time.Sleep(g.interval)
