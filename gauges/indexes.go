@@ -92,7 +92,7 @@ func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 			if err := g.query(schemaIndexBlocksReadQuery, &schemas, emptyParams); err == nil {
 				for _, schema := range schemas {
 					gauge.With(prometheus.Labels{
-						"table": schema.Name,
+						"schema": schema.Name,
 					}).Set(table.IndexBlocksRead)
 				}
 			}
@@ -135,7 +135,7 @@ func (g *Gauges) IndexBlocksRead() prometheus.Gauge {
 			if err := g.query(schemaIndexBlocksHitQuery, &schemas, emptyParams); err == nil {
 				for _, schema := range schemas {
 					gauge.With(prometheus.Labels{
-						"table": schema.Name,
+						"schema": schema.Name,
 					}).Set(table.IndexBlocksRead)
 				}
 			}
