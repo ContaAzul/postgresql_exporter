@@ -29,23 +29,45 @@ func TestUnusedIndexes(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestIndexBlocksRead(t *testing.T) {
+func TestIndexBlocksReadBySchema(t *testing.T) {
 	var assert = assert.New(t)
-	_, gauges, close := prepare(t)
+	db, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.IndexBlocksRead())
+	dropTestTable := createTestTable(t, db)
+	defer dropTestTable()
+	var metrics = evaluate(t, gauges.IndexBlocksReadBySchema())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
 	assertNoErrs(t, gauges)
 }
 
-func TestIndexBlocksHit(t *testing.T) {
+func TestIndexBlocksReadBySchemaWithoutIndexes(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.IndexBlocksHit())
+	var metrics = evaluate(t, gauges.IndexBlocksReadBySchema())
+	assert.Len(metrics, 0)
+	assertNoErrs(t, gauges)
+}
+
+func TestIndexBlocksHitBySchema(t *testing.T) {
+	var assert = assert.New(t)
+	db, gauges, close := prepare(t)
+	defer close()
+	dropTestTable := createTestTable(t, db)
+	defer dropTestTable()
+	var metrics = evaluate(t, gauges.IndexBlocksHitBySchema())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, -1, metrics[0])
+	assertNoErrs(t, gauges)
+}
+
+func TestIndexBlocksHitBySchemaWithoutIndexes(t *testing.T) {
+	var assert = assert.New(t)
+	_, gauges, close := prepare(t)
+	defer close()
+	var metrics = evaluate(t, gauges.IndexBlocksHitBySchema())
+	assert.Len(metrics, 0)
 	assertNoErrs(t, gauges)
 }
 

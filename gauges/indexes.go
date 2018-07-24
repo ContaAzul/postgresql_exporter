@@ -2,6 +2,7 @@ package gauges
 
 import (
 	"time"
+	"github.com/apex/log"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -67,7 +68,7 @@ type schemaIndexBlocksRead struct {
 }
 
 // IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
-func (g *Gauges) IndexBlocksRead() *prometheus.GaugeVec {
+func (g *Gauges) IndexBlocksReadBySchema() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blocks_read_sum",
@@ -90,7 +91,9 @@ func (g *Gauges) IndexBlocksRead() *prometheus.GaugeVec {
 		for {
 			var schemas []schemaIndexBlocksRead
 			if err := g.query(schemaIndexBlocksReadQuery, &schemas, emptyParams); err == nil {
+				log.WithField("schemas", schemas).Info("started")
 				for _, schema := range schemas {
+					log.Info("*********************************Achou")
 					gauge.With(prometheus.Labels{
 						"schema": schema.Name,
 					}).Set(schema.IndexBlocksRead)
@@ -110,7 +113,7 @@ type schemaIndexBlocksHit struct {
 }
 
 // IndexBlocksHit returns the sum of the number of buffer hits on all user indexes
-func (g *Gauges) IndexBlocksHit() *prometheus.GaugeVec {
+func (g *Gauges) IndexBlocksHitBySchema() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_index_blocks_hit_sum",
