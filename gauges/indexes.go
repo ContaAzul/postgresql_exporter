@@ -63,7 +63,7 @@ func (g *Gauges) UnusedIndexes() prometheus.Gauge {
 
 type schemaIndexBlocksRead struct {
 	Name     		string  `db:"schemaname"`
-	IndexBlocksRead float64 `db:"idx_blks_read"`
+	IndexBlocksRead	float64 `db:"idx_blks_read"`
 }
 
 // IndexBlocksRead returns the sum of the number of disk blocks read from all public indexes
@@ -106,7 +106,7 @@ func (g *Gauges) IndexBlocksReadBySchema() *prometheus.GaugeVec {
 
 type schemaIndexBlocksHit struct {
 	Name     		string  `db:"schemaname"`
-	IndexBlocksHit float64 `db:"idx_blks_hit"`
+	IndexBlocksHit	float64 `db:"idx_blks_hit"`
 }
 
 // IndexBlocksHit returns the sum of the number of buffer hits on all user indexes
