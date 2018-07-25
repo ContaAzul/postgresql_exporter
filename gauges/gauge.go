@@ -12,13 +12,12 @@ import (
 )
 
 type Gauges struct {
-	name        string
-	db          *sqlx.DB
-	interval    time.Duration
-	timeout     time.Duration
-	labels      prometheus.Labels
-	Errs        prometheus.Gauge
-	isSuperuser bool
+	name     string
+	db       *sqlx.DB
+	interval time.Duration
+	timeout  time.Duration
+	labels   prometheus.Labels
+	Errs     prometheus.Gauge
 }
 
 func New(name string, db *sql.DB, interval, timeout time.Duration) *Gauges {
@@ -27,12 +26,11 @@ func New(name string, db *sql.DB, interval, timeout time.Duration) *Gauges {
 	}
 	var dbx = sqlx.NewDb(db, "postgres")
 	return &Gauges{
-		name:        name,
-		db:          dbx,
-		interval:    interval,
-		timeout:     timeout,
-		labels:      labels,
-		isSuperuser: isSuperuser(dbx, timeout),
+		name:     name,
+		db:       dbx,
+		interval: interval,
+		timeout:  timeout,
+		labels:   labels,
 		Errs: prometheus.NewGauge(
 			prometheus.GaugeOpts{
 				Name:        "postgresql_query_errors",
@@ -41,25 +39,6 @@ func New(name string, db *sql.DB, interval, timeout time.Duration) *Gauges {
 			},
 		),
 	}
-}
-
-func isSuperuser(db *sqlx.DB, timeout time.Duration) (super bool) {
-	ctx, cancel := context.WithDeadline(
-		context.Background(),
-		time.Now().Add(timeout),
-	)
-	defer func() {
-		<-ctx.Done()
-	}()
-	if err := db.GetContext(
-		ctx,
-		&super,
-		"select usesuper from pg_user where usename = CURRENT_USER",
-	); err != nil {
-		log.WithError(err).Error("failed to detect user privileges")
-	}
-	cancel()
-	return
 }
 
 func (g *Gauges) hasSharedPreloadLibrary(lib string) bool {
