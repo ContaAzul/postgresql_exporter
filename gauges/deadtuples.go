@@ -7,36 +7,30 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-type Relation struct {
+type relation struct {
 	Name string `db:"relname"`
 }
 
-var relationsQuery = `
-SELECT relname
-FROM pg_stat_user_tables
-ORDER BY n_tup_ins + n_tup_upd desc
-LIMIT 20
-`
-
+// DeadTuples returns the percentage of dead tuples on the top 20 biggest tables
 func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name:        "postgresql_dead_tuples_pct",
-		Help:        "dead tuples percentage on the top 20 biggest tables",
+		Help:        "percentage of dead tuples on the top 20 biggest tables",
 		ConstLabels: g.labels,
 	}, []string{"table"})
 
-	if !g.isSuperuser {
-		log.Warn("postgresql_dead_tuples_pct disabled because pgstattuple requires a superuser")
-		return gauge
-	}
 	if !g.hasExtension("pgstattuple") {
 		log.Warn("postgresql_dead_tuples_pct disabled because pgstattuple extension is not installed")
 		return gauge
 	}
 
+	const relationsQuery = `
+		SELECT relname FROM pg_stat_user_tables ORDER BY n_tup_ins + n_tup_upd desc LIMIT 20
+	`
+
 	go func() {
 		for {
-			var tables []Relation
+			var tables []relation
 			g.query(relationsQuery, &tables, emptyParams)
 			for _, table := range tables {
 				var pct []float64
