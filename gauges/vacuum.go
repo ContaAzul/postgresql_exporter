@@ -113,7 +113,8 @@ func (g *Gauges) VacuumRunningTotal() prometheus.Gauge {
 	`
 
 	if !postgres.Version(g.version()).Is96Or10() {
-		log.Warn("postgresql_vacuum_running_total disabled because it's only supported for PostgreSQL 9.6 or newer versions")
+		log.WithField("db", g.name).
+			Warn("postgresql_vacuum_running_total disabled because it's only supported for PostgreSQL 9.6 or newer versions")
 		return prometheus.NewGauge(gaugeOpts)
 	}
 	return g.new(gaugeOpts, vacuumRunningQuery)
