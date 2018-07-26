@@ -20,11 +20,13 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 	}, []string{"table"})
 
 	if !g.hasExtension("pgstattuple") {
-		log.Warn("postgresql_dead_tuples_pct disabled because pgstattuple extension is not installed")
+		log.WithField("db", g.name).
+			Warn("postgresql_dead_tuples_pct disabled because pgstattuple extension is not installed")
 		return gauge
 	}
 	if !g.hasPermissionToExecutePgStatTuple() {
-		log.Warn("postgresql_dead_tuples_pct disabled because user doesn't have permission to use pgstattuple functions")
+		log.WithField("db", g.name).
+			Warn("postgresql_dead_tuples_pct disabled because user doesn't have permission to use pgstattuple functions")
 		return gauge
 	}
 
@@ -56,7 +58,7 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 
 func (g *Gauges) hasPermissionToExecutePgStatTuple() bool {
 	if _, err := g.db.Exec("SELECT 1 FROM pgstattuple('pg_class')"); err != nil {
-		log.WithError(err).Error("failed to execute pgstattuple function")
+		log.WithField("db", g.name).WithError(err).Error("failed to execute pgstattuple function")
 		return false
 	}
 	return true
