@@ -50,7 +50,7 @@ func (g *Gauges) DatabaseDeadRows() prometheus.Gauge {
 			Help:        "Estimated number of dead rows in a database",
 			ConstLabels: g.labels,
 		},
-		"SELECT sum(coalesce(n_dead_tup, 0)) as n_dead_tup FROM pg_stat_user_tables",
+		"SELECT coalesce(sum(n_dead_tup), 0) as n_dead_tup FROM pg_stat_user_tables",
 	)
 }
 
@@ -98,6 +98,6 @@ func (g *Gauges) DatabaseLiveRows() prometheus.Gauge {
 			Help:        "Estimated number of live rows in a database",
 			ConstLabels: g.labels,
 		},
-		"SELECT sum(coalesce(n_live_tup, 0)) as n_live_tup FROM pg_stat_user_tables",
+		"SELECT coalesce(sum(n_live_tup), 0) as n_live_tup FROM pg_stat_user_tables",
 	)
 }
