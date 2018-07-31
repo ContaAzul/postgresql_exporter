@@ -55,6 +55,7 @@ func (g *Gauges) BackendsByState() *prometheus.GaugeVec {
 	`
 
 	go func() {
+		gauge.Reset()
 		for {
 			var backendsByState []backendsByState
 			if err := g.query(backendsByStateQuery, &backendsByState, emptyParams); err == nil {
@@ -109,6 +110,7 @@ func (g *Gauges) BackendsByWaitEventType() *prometheus.GaugeVec {
 	)
 
 	go func() {
+		gauge.Reset()
 		for {
 			var backendsByWaitEventType []backendsByWaitEventType
 			if err := g.query(g.backendsByWaitEventTypeQuery(),
