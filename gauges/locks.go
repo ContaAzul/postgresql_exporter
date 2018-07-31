@@ -23,6 +23,7 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 	)
 	go func() {
 		for {
+			gauge.Reset()
 			var locks []locks
 			if err := g.query(
 				`
