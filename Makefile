@@ -1,7 +1,7 @@
 setup:
 	go get -u gopkg.in/alecthomas/gometalinter.v2
 	go get -u github.com/golang/dep/cmd/dep
-	dep ensure -v
+	dep ensure -v -vendor-only
 	gometalinter.v2 --install
 
 build:
