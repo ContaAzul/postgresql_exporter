@@ -11,6 +11,7 @@ import (
 const slowQueriesQuery = `
 	SELECT total_time, query
 	FROM pg_stat_statements
+	WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
 	ORDER BY total_time desc limit 10
 `
 
