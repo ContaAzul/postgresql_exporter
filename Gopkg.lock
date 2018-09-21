@@ -25,8 +25,8 @@
 [[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
-  revision = "346938d642f2ec3594ed81d874461961cd0faa76"
-  version = "v1.1.0"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
 
 [[projects]]
   name = "github.com/go-logfmt/logfmt"
@@ -37,8 +37,8 @@
 [[projects]]
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
@@ -56,13 +56,13 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
-  branch = "master"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "oid"
   ]
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -116,7 +116,7 @@
     "nfs",
     "xfs"
   ]
-  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+  revision = "418d78d0b9a7b7de3a6bbc8a23def624cc977bb2"
 
 [[projects]]
   name = "github.com/stretchr/testify"
