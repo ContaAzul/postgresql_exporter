@@ -8,15 +8,16 @@ import (
 
 type locks struct {
 	Mode  string  `db:"mode"`
+	Type  string  `db:"locktype"`
 	Count float64 `db:"count"`
 }
 
-// Locks returns the number of active locks on the database by mode
+// Locks returns the number of active locks on the database by locktype and mode
 func (g *Gauges) Locks() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_locks_total",
-			Help:        "Number of active locks on the database by mode",
+			Name:        "postgresql_locks",
+			Help:        "Number of active locks on the database by locktype and mode",
 			ConstLabels: g.labels,
 		},
 		[]string{"mode"},
@@ -27,20 +28,21 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 			var locks []locks
 			if err := g.query(
 				`
-					SELECT mode, count(*) as count
+					SELECT locktype, mode, count(*) as count
 					FROM pg_locks
 					WHERE database = (
 						SELECT datid
 						FROM pg_stat_database
 						WHERE datname = current_database()
-					) GROUP BY mode;
+					) GROUP BY locktype, mode;
 				`,
 				&locks,
 				emptyParams,
 			); err == nil {
 				for _, lock := range locks {
 					gauge.With(prometheus.Labels{
-						"mode": lock.Mode,
+						"locktype": lock.Type,
+						"mode":     lock.Mode,
 					}).Set(lock.Count)
 				}
 			}
@@ -54,7 +56,7 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 func (g *Gauges) NotGrantedLocks() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_not_granted_locks_total",
+			Name:        "postgresql_not_granted_locks",
 			Help:        "Number of not granted locks on the database",
 			ConstLabels: g.labels,
 		},
@@ -75,7 +77,7 @@ func (g *Gauges) NotGrantedLocks() prometheus.Gauge {
 func (g *Gauges) DeadLocks() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_deadlocks_total",
+			Name:        "postgresql_deadlocks",
 			Help:        "Number of deadlocks detected on the database",
 			ConstLabels: g.labels,
 		},
