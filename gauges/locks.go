@@ -20,7 +20,7 @@ func (g *Gauges) Locks() *prometheus.GaugeVec {
 			Help:        "Number of active locks on the database by locktype and mode",
 			ConstLabels: g.labels,
 		},
-		[]string{"mode"},
+		[]string{"locktype", "mode"},
 	)
 	go func() {
 		for {
