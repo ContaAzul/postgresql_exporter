@@ -82,7 +82,7 @@ type backendsByUserAndClientAddress struct {
 func (g *Gauges) BackendsByUserAndClientAddress() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_backends_by_state_total",
+			Name:        "postgresql_backends_by_user_total",
 			Help:        "Number of backends currently connected to database by user and client address",
 			ConstLabels: g.labels,
 		},
@@ -93,7 +93,7 @@ func (g *Gauges) BackendsByUserAndClientAddress() *prometheus.GaugeVec {
 		SELECT
 		  COUNT(*) AS total,
 		  usename,
-		  COALESCE(client_addr, '127.0.0.1') AS client_addr
+		  COALESCE(client_addr, '::1') AS client_addr
 		FROM pg_stat_activity
 		WHERE datname = current_database()
 		GROUP BY usename, client_addr
