@@ -71,6 +71,52 @@ func (g *Gauges) BackendsByState() *prometheus.GaugeVec {
 	return gauge
 }
 
+type backendsByUserAndClientAddress struct {
+	Total      float64 `db:"total"`
+	User       string  `db:"usename"`
+	ClientAddr string  `db:"client_addr"`
+}
+
+// BackendsByUserAndClientAddress returns the number of backends currently connected
+// to database by user and client address
+func (g *Gauges) BackendsByUserAndClientAddress() *prometheus.GaugeVec {
+	var gauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_backends_by_state_total",
+			Help:        "Number of backends currently connected to database by user and client address",
+			ConstLabels: g.labels,
+		},
+		[]string{"user", "client_addr"},
+	)
+
+	const backendsByUserAndClientAddressQuery = `
+		SELECT
+		  COUNT(*) AS total,
+		  usename,
+		  COALESCE(client_addr, '127.0.0.1') AS client_addr
+		FROM pg_stat_activity
+		WHERE datname = current_database()
+		GROUP BY usename, client_addr
+	`
+
+	go func() {
+		for {
+			gauge.Reset()
+			var backendsByUserAndClientAddress []backendsByUserAndClientAddress
+			if err := g.query(backendsByUserAndClientAddressQuery, &backendsByUserAndClientAddress, emptyParams); err == nil {
+				for _, row := range backendsByUserAndClientAddress {
+					gauge.With(prometheus.Labels{
+						"user":        row.User,
+						"client_addr": row.ClientAddr,
+					}).Set(row.Total)
+				}
+			}
+			time.Sleep(g.interval)
+		}
+	}()
+	return gauge
+}
+
 type backendsByWaitEventType struct {
 	Total         float64 `db:"total"`
 	WaitEventType string  `db:"wait_event_type"`
