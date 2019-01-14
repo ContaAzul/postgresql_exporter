@@ -253,7 +253,7 @@ type indexBloat struct {
 }
 
 // IndexBloat returns bloat percentage of an index reporting only for indexes
-// with size greater than 10mb and bloat lower than 50%
+// with size greater than 10mb and bloat greater than 50%
 func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -274,7 +274,7 @@ func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
 					}).Set(idx.Pct)
 				}
 			}
-			time.Sleep(g.interval)
+			time.Sleep(1 * time.Hour)
 		}
 	}()
 	return gauge

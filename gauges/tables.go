@@ -130,11 +130,13 @@ type tableBloat struct {
 	Pct  float64 `db:"pct_bloat"`
 }
 
+// TableBloat returns the bloat percentage of a table reporting only for tables
+// with bloat percentange greater than 30% or greater than 1000mb
 func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_table_bloat_pct",
-			Help:        "bloat percentage of an index. Reports only for tables with a lot of bloat",
+			Help:        "bloat percentage of a table. Reports only for tables with a lot of bloat",
 			ConstLabels: g.labels,
 		},
 		[]string{"table"},
@@ -149,7 +151,7 @@ func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 					}).Set(table.Pct)
 				}
 			}
-			time.Sleep(g.interval)
+			time.Sleep(1 * time.Hour)
 		}
 	}()
 	return gauge
