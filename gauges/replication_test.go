@@ -16,7 +16,7 @@ func TestReplicationStatus(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestReplicationDelay(t *testing.T) {
+func TestReplicationDelayInSeconds(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()

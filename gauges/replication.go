@@ -51,7 +51,7 @@ func (g *Gauges) StreamingWALs() prometheus.Gauge {
 	)
 }
 
-// ReplicationDelay returns a prometheus gauge for the database replication
+// ReplicationDelayInSeconds returns a prometheus gauge for the database replication
 // lag in seconds
 func (g *Gauges) ReplicationDelayInSeconds() prometheus.Gauge {
 	return g.new(
