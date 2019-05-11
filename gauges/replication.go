@@ -60,7 +60,12 @@ func (g *Gauges) ReplicationDelayInSeconds() prometheus.Gauge {
 			Help:        "Dabatase replication delay in seconds",
 			ConstLabels: g.labels,
 		},
-		"SELECT coalesce(extract(epoch from now() - pg_last_xact_replay_timestamp()), 0) AS replication_delay",
+		`
+			SELECT CASE WHEN pg_is_in_recovery() is true
+			THEN COALESCE(EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp()), 0)
+			ELSE 0
+			END AS replication_delay
+		`,
 	)
 }
 
