@@ -123,7 +123,7 @@ type backendsByWaitEventType struct {
 }
 
 func (g *Gauges) backendsByWaitEventTypeQuery() string {
-	if postgres.Version(g.version()).Is96Or10() {
+	if postgres.Version(g.version()).IsEqualOrGreaterThan96() {
 		return `
 			SELECT
 			  COUNT(*) AS total,
