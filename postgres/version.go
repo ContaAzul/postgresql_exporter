@@ -3,12 +3,12 @@ package postgres
 // Version for a postgres server
 type Version int
 
-// IsEqualOrGreaterThan96 returns whether this is version is greater than 9.6.x
+// IsEqualOrGreaterThan96 returns whether this is version is greater than 9.6.0
 func (v Version) IsEqualOrGreaterThan96() bool {
 	return v >= 90600
 }
 
-// IsEqualOrGreaterThan10 returns whether this is version is greater than 10.x
+// IsEqualOrGreaterThan10 returns whether this is version is greater than 10.0
 func (v Version) IsEqualOrGreaterThan10() bool {
 	return v >= 100000
 }
