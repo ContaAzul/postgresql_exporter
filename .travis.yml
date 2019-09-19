@@ -5,6 +5,7 @@ go: "1.10"
 addons:
   postgresql: "11.2"
 before_script:
+  - sudo apt-get install -y postgresql-11 postgresql-client-11
   - psql --version
   - sudo service postgresql status
   - psql -U travis -c "ALTER SYSTEM SET wal_level TO 'logical';"
