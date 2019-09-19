@@ -4,10 +4,8 @@ language: go
 go: "1.10"
 addons:
   postgresql: "9.6"
-  command:
-    - "postgres"
-    - "-c"
-    - "wal_level=logical"
+before_script:
+  - psql -U postgres -c "ALTER SYSTEM SET wal_level TO 'logical';"
 services:
   - docker
   - postgresql
