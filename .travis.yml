@@ -3,10 +3,11 @@ sudo: required
 language: go
 go: "1.10"
 addons:
-  postgresql: "11.3"
+  postgresql: "11.2"
+  apt:
+    packages:
+      - postgresql-11
 before_script:
-  - psql --version
-  - sudo service postgresql status
   - psql -U travis -c "ALTER SYSTEM SET wal_level TO 'logical';"
   - psql -U travis -c "ALTER SYSTEM SET max_replication_slots TO '10';"
   - sudo /etc/init.d/postgresql restart 
