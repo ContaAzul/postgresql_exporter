@@ -7,10 +7,9 @@ import (
 )
 
 type slots struct {
-	DatabaseName string  `db:"database_name"`
 	SlotName     string  `db:"slot_name"`
-	Active       float64 `db:"active"`
-	TotalLag     float64 `db:"total_lag"`
+	IsSlotActive float64 `db:"active"`
+	SlotTotalLag float64 `db:"total_lag"`
 }
 
 // ReplicationSlotStatus returns the state of the replication slots
@@ -21,7 +20,7 @@ func (g *Gauges) ReplicationSlotStatus() *prometheus.GaugeVec {
 			Help:        "State of the replication slots",
 			ConstLabels: g.labels,
 		},
-		[]string{"database_name", "slot_name"},
+		[]string{"slot_name"},
 	)
 	go func() {
 		for {
@@ -30,20 +29,19 @@ func (g *Gauges) ReplicationSlotStatus() *prometheus.GaugeVec {
 			if err := g.query(
 				`
 					SELECT
-						"database" AS database_name,
 						slot_name,
 						active::int
 					FROM pg_replication_slots
-					WHERE slot_type = 'logical';
+					WHERE slot_type = 'logical'
+					  AND "database" = current_database();
 				`,
 				&slots,
 				emptyParams,
 			); err == nil {
 				for _, slot := range slots {
 					gauge.With(prometheus.Labels{
-						"database_name": lock.DatabaseName,
-						"slot_name":     lock.SlotName,
-					}).Set(slot.Active)
+						"slot_name": slot.SlotName,
+					}).Set(slot.IsSlotActive)
 				}
 			}
 			time.Sleep(g.interval)
@@ -60,7 +58,7 @@ func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
 			Help:        "Total lag of the replication slots",
 			ConstLabels: g.labels,
 		},
-		[]string{"database_name", "slot_name"},
+		[]string{"slot_name"},
 	)
 	go func() {
 		for {
@@ -69,20 +67,19 @@ func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
 			if err := g.query(
 				`
 					SELECT
-						"database" AS database_name,
 						slot_name,
 						round(pg_wal_lsn_diff(pg_current_wal_lsn(), confirmed_flush_lsn) / 1048576, 0) AS total_lag
 					FROM pg_replication_slots
-					WHERE slot_type = 'logical';
+					WHERE slot_type = 'logical'
+					  AND "database" = current_database();
 				`,
 				&slots,
 				emptyParams,
 			); err == nil {
 				for _, slot := range slots {
 					gauge.With(prometheus.Labels{
-						"database_name": lock.DatabaseName,
-						"slot_name":     lock.SlotName,
-					}).Set(slot.TotalLag)
+						"slot_name": slot.SlotName,
+					}).Set(slot.SlotTotalLag)
 				}
 			}
 			time.Sleep(g.interval)
