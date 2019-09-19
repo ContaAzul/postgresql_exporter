@@ -5,7 +5,8 @@ go: "1.10"
 addons:
   postgresql: "9.6"
 before_script:
-  - psql -U postgres -c "ALTER SYSTEM SET max_replication_slots TO '10';"
+  - psql -U postgres -c "ALTER SYSTEM SET wal_level TO 'logical';"
+  - sudo /etc/init.d/postgresql restart 
 services:
   - docker
   - postgresql
