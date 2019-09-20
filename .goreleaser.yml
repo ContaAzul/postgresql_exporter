@@ -27,6 +27,5 @@ dockers:
     - 'caninjas/postgresql_exporter:{{ .Tag }}'
     - 'caninjas/postgresql_exporter:v{{ .Major }}'
     - 'caninjas/postgresql_exporter:v{{ .Major }}.{{ .Minor }}'
-    - latest
   extra_files:
   - config.yml
