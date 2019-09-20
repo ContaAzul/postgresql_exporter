@@ -11,7 +11,7 @@ import (
 type slots struct {
 	SlotName     string  `db:"slot_name"`
 	Active float64 `db:"active"`
-	SlotTotalLag float64 `db:"total_lag"`
+	TotalLag float64 `db:"total_lag"`
 }
 
 // ReplicationSlotStatus returns the state of the replication slots
