@@ -121,5 +121,5 @@ func watch(db *sql.DB, reg prometheus.Registerer, name string) {
 	reg.MustRegister(gauges.LastTimeAutoVacuumRan())
 	reg.MustRegister(gauges.VacuumRunningTotal())
 	reg.MustRegister(gauges.ReplicationSlotStatus())
-	reg.MustRegister(gauges.ReplicationSlotLagInMegabytes())
+	reg.MustRegister(gauges.ReplicationSlotLagInBytes())
 }

@@ -10,7 +10,7 @@ import (
 
 type slots struct {
 	Name     string  `db:"slot_name"`
-	Active float64 `db:"active"`
+	Active   float64 `db:"active"`
 	TotalLag float64 `db:"total_lag"`
 }
 
@@ -42,8 +42,8 @@ func (g *Gauges) ReplicationSlotStatus() *prometheus.GaugeVec {
 			); err == nil {
 				for _, slot := range slots {
 					gauge.With(prometheus.Labels{
-						"slot_name": slot.SlotName,
-					}).Set(slot.IsSlotActive)
+						"slot_name": slot.Name,
+					}).Set(slot.Active)
 				}
 			}
 			time.Sleep(g.interval)
@@ -52,12 +52,12 @@ func (g *Gauges) ReplicationSlotStatus() *prometheus.GaugeVec {
 	return gauge
 }
 
-// ReplicationSlotLagInMegabytes returns the total lag from the replication slots
-func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
+// ReplicationSlotLagInBytes returns the total lag in bytes from the replication slots
+func (g *Gauges) ReplicationSlotLagInBytes() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_replication_slot_lag",
-			Help:        "Total lag of the replication slots",
+			Name:        "postgresql_replication_lag_bytes",
+			Help:        "Total lag in bytes of the replication slots",
 			ConstLabels: g.labels,
 		},
 		[]string{"slot_name"},
@@ -84,8 +84,8 @@ func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
 			); err == nil {
 				for _, slot := range slots {
 					gauge.With(prometheus.Labels{
-						"slot_name": slot.SlotName,
-					}).Set(slot.SlotTotalLag)
+						"slot_name": slot.Name,
+					}).Set(slot.TotalLag)
 				}
 			}
 			time.Sleep(g.interval)
