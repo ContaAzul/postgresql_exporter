@@ -22,11 +22,11 @@ changelog:
     exclude:
     - '^Merge (remote|branch|pull)'
 dockers:
-- image: caninjas/postgresql_exporter
-  tag_templates:
-    - '{{ .Tag }}'
-    - 'v{{ .Major }}'
-    - 'v{{ .Major }}.{{ .Minor }}'
+- image_templates:
+    - 'caninjas/postgresql_exporter:latest'
+    - 'caninjas/postgresql_exporter:{{ .Tag }}'
+    - 'caninjas/postgresql_exporter:v{{ .Major }}'
+    - 'caninjas/postgresql_exporter:v{{ .Major }}.{{ .Minor }}'
     - latest
   extra_files:
   - config.yml
