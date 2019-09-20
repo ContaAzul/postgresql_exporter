@@ -71,7 +71,7 @@ func (g *Gauges) ReplicationSlotLagInBytes() *prometheus.GaugeVec {
 					`
 						SELECT
 							slot_name,
-							round(%s(%s(), confirmed_flush_lsn) / 1048576, 0) AS total_lag
+							%s(%s(), confirmed_flush_lsn) AS total_lag
 						FROM pg_replication_slots
 						WHERE slot_type = 'logical'
 						AND "database" = current_database();
