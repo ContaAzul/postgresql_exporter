@@ -19,7 +19,7 @@ func (g *Gauges) ReplicationSlotStatus() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_replication_slot_status",
-			Help:        "State of the replication slots",
+			Help:        "Returns 1 if the slot is currently actively being used",
 			ConstLabels: g.labels,
 		},
 		[]string{"slot_name"},
