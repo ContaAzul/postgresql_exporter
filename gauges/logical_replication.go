@@ -1,10 +1,10 @@
 package gauges
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ContaAzul/postgresql_exporter/postgres"
-	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -62,24 +62,23 @@ func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
 		},
 		[]string{"slot_name"},
 	)
-	if !postgres.Version(g.version()).IsEqualOrGreaterThan10() {
-		log.WithField("db", g.name).
-			Warn("postgresql_replication_slot_lag disabled because it's only supported for PostgreSQL 10 or newer versions")
-		return gauge
-	}
 	go func() {
 		for {
 			gauge.Reset()
 			var slots []slots
 			if err := g.query(
-				`
-					SELECT
-						slot_name,
-						round(pg_wal_lsn_diff(pg_current_wal_lsn(), confirmed_flush_lsn) / 1048576, 0) AS total_lag
-					FROM pg_replication_slots
-					WHERE slot_type = 'logical'
-					  AND "database" = current_database();
-				`,
+				fmt.Sprintf(
+					`
+						SELECT
+							slot_name,
+							round(%s(%s(), confirmed_flush_lsn) / 1048576, 0) AS total_lag
+						FROM pg_replication_slots
+						WHERE slot_type = 'logical'
+						AND "database" = current_database();
+					`,
+					postgres.Version(g.version()).WalLsnDiffFunctionName(),
+					postgres.Version(g.version()).CurrentWalLsnFunctionName(),
+				),
 				&slots,
 				emptyParams,
 			); err == nil {
