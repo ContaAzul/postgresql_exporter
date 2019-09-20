@@ -3,6 +3,8 @@ package gauges
 import (
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
+	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -60,6 +62,11 @@ func (g *Gauges) ReplicationSlotLagInMegabytes() *prometheus.GaugeVec {
 		},
 		[]string{"slot_name"},
 	)
+	if !postgres.Version(g.version()).IsEqualOrGreaterThan10() {
+		log.WithField("db", g.name).
+			Warn("postgresql_replication_slot_lag disabled because it's only supported for PostgreSQL 10 or newer versions")
+		return gauge
+	}
 	go func() {
 		for {
 			gauge.Reset()
