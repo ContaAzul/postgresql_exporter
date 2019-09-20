@@ -9,7 +9,7 @@ import (
 )
 
 type slots struct {
-	SlotName     string  `db:"slot_name"`
+	Name     string  `db:"slot_name"`
 	Active float64 `db:"active"`
 	TotalLag float64 `db:"total_lag"`
 }
