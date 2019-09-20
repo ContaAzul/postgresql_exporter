@@ -49,7 +49,8 @@ func (v Version) LastWalReplayedLsnFunctionName() string {
 	return "pg_last_xlog_replay_location"
 }
 
-// CurrentWalLsnFunctionName returns the name of the function that gets the current wal LSN
+// CurrentWalLsnFunctionName returns the name of the function that gets current 
+// write-ahead log write location according to the postgres version
 func (v Version) CurrentWalLsnFunctionName() string {
 	if v.IsEqualOrGreaterThan10() {
 		return "pg_current_wal_lsn"
