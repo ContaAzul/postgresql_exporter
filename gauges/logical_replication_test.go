@@ -28,8 +28,7 @@ func TestReplicationSlotLagInMegabytes(t *testing.T) {
 	dropTestLogicalReplicationSlot := createTestLogicalReplicationSlot("test_lag", t, db)
 	defer dropTestLogicalReplicationSlot()
 	var metrics = evaluate(t, gauges.ReplicationSlotLagInMegabytes())
-	assert.Len(metrics, 1)
-	assertEqual(t, 0, metrics[0])
+	assert.Len(metrics, 0)
 	assertNoErrs(t, gauges)
 }
 
