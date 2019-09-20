@@ -57,7 +57,7 @@ func (g *Gauges) ReplicationSlotLagInBytes() *prometheus.GaugeVec {
 	var gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_replication_lag_bytes",
-			Help:        "Total lag in bytes of the replication slots",
+			Help:        "Total lag of the replication slots in bytes",
 			ConstLabels: g.labels,
 		},
 		[]string{"slot_name"},
