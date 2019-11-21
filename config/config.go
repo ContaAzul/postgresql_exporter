@@ -25,5 +25,16 @@ func Parse(path string) Config {
 	if err := yaml.Unmarshal(bts, &cfg); err != nil {
 		log.WithError(err).Fatalf("failed to unmarshall config file: %s", path)
 	}
-	return cfg
+	return validate(cfg)
+}
+
+func validate(config Config) Config {
+	names := make(map[string]bool)
+	for _, conf := range config.Databases {
+		if names[conf.Name] {
+			log.Fatalf("failed to validate configuration. A database named '%s' has already been declared'", conf.Name)
+		}
+		names[conf.Name] = true
+	}
+	return config
 }
