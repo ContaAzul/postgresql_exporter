@@ -1,0 +1,2 @@
+- name: dba
+  url: postgres://localhost:5432/dba?sslmode=disable

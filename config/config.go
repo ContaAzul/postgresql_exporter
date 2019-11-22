@@ -1,9 +1,10 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 
-	"github.com/apex/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,25 +17,34 @@ type Config struct {
 	Databases []Database `yaml:"databases,omitempty"`
 }
 
-func Parse(path string) Config {
+func Parse(path string) (Config, error) {
 	var cfg Config
 	bts, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.WithError(err).Fatalf("failed to read config file: %s", path)
+		return cfg, fmt.Errorf("failed to read config file '%s': %s", path, err)
 	}
 	if err := yaml.Unmarshal(bts, &cfg); err != nil {
-		log.WithError(err).Fatalf("failed to unmarshall config file: %s", path)
+		return cfg, fmt.Errorf("failed to unmarshall config file '%s': %s", path, err)
 	}
-	return validate(cfg)
+	if err := validate(cfg); err != nil {
+		return cfg, err
+	}
+	return cfg, nil
 }
 
-func validate(config Config) Config {
+func validate(config Config) error {
 	names := make(map[string]bool)
 	for _, conf := range config.Databases {
+		if conf.Name == "" {
+			return errors.New("failed to validate configuration. Database name cannot be empty")
+		}
+		if conf.URL == "" {
+			return fmt.Errorf("failed to validate configuration. URL for database '%s' cannot be empty", conf.Name)
+		}
 		if names[conf.Name] {
-			log.Fatalf("failed to validate configuration. A database named '%s' has already been declared'", conf.Name)
+			return fmt.Errorf("failed to validate configuration. A database named '%s' has already been declared", conf.Name)
 		}
 		names[conf.Name] = true
 	}
-	return config
+	return nil
 }

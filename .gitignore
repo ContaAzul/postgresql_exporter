@@ -1,4 +1,5 @@
 vendor
+coverage.out
 test_config.yml
 postgresql_exporter
 dist

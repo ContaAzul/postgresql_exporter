@@ -49,7 +49,12 @@ func main() {
 		`))
 	})
 	http.Handle("/metrics", promhttp.Handler())
-	var config = config.Parse(*configFile)
+
+	var config, err = config.Parse(*configFile)
+	if err != nil {
+		log.WithError(err).Fatalf("error to parse config file")
+	}
+
 	for _, con := range config.Databases {
 		var log = log.WithField("db", con.Name)
 		log.Info("started monitoring")
