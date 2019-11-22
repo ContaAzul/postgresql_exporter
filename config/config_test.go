@@ -2,13 +2,18 @@ package config
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseConfig(t *testing.T) {
-	_, err := Parse("testdata/valid-config.yml")
-	if err != nil {
-		t.Errorf("Error loading config: %v", err)
-	}
+	config, err := Parse("testdata/valid-config.yml")
+	require.NoError(t, err)
+
+	assert.Len(t, config.Databases, 2)
+	assert.Equal(t, "dba", config.Databases[0].Name)
+	assert.Equal(t, "postgres://localhost:5432/dba?sslmode=disable", config.Databases[0].URL)
 }
 
 func TestParseBadConfigs(t *testing.T) {
