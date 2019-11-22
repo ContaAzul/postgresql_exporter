@@ -1,0 +1,4 @@
+databases:
+- name: dba
+- name: dbb
+  url: postgres://user:pwd@mydb.foo.bar:5432/dbb

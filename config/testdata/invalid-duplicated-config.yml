@@ -1,0 +1,5 @@
+databases:
+- name: dba
+  url: postgres://localhost:5432/dba?sslmode=disable
+- name: dba
+  url: postgres://user:pwd@mydb.foo.bar:5432/dbb
