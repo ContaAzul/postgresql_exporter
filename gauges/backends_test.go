@@ -30,7 +30,7 @@ func TestInstanceConnectedBackends(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
-	var metrics = evaluate(t, gauges.MaxBackends())
+	var metrics = evaluate(t, gauges.InstanceConnectedBackends())
 	assert.Len(metrics, 1)
 	assertGreaterThan(t, 0, metrics[0])
 	assertNoErrs(t, gauges)
