@@ -31,8 +31,8 @@ func (g *Gauges) MaxBackends() prometheus.Gauge {
 	)
 }
 
-// CurrentBackends returns the number of backends currently connected to all databases 
-func (g *Gauges) CurrentBackends() prometheus.Gauge {
+// InstanceConnectedBackends returns the number of backends currently connected to all databases 
+func (g *Gauges) InstanceConnectedBackends() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
 			Name:        "postgresql_instance_connected_backends",

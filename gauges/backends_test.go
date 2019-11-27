@@ -26,7 +26,7 @@ func TestMaxBackends(t *testing.T) {
 	assertNoErrs(t, gauges)
 }
 
-func TestCurrentBackends(t *testing.T) {
+func TestInstanceConnectedBackends(t *testing.T) {
 	var assert = assert.New(t)
 	_, gauges, close := prepare(t)
 	defer close()
