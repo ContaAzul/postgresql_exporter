@@ -35,7 +35,7 @@ func (g *Gauges) MaxBackends() prometheus.Gauge {
 func (g *Gauges) CurrentBackends() prometheus.Gauge {
 	return g.new(
 		prometheus.GaugeOpts{
-			Name:        "postgresql_current_backends",
+			Name:        "postgresql_instance_connected_backends",
 			Help:        "Current number of concurrent connections in all databases",
 			ConstLabels: g.labels,
 		},
