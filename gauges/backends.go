@@ -31,6 +31,18 @@ func (g *Gauges) MaxBackends() prometheus.Gauge {
 	)
 }
 
+// InstanceConnectedBackends returns the number of backends currently connected to all databases 
+func (g *Gauges) InstanceConnectedBackends() prometheus.Gauge {
+	return g.new(
+		prometheus.GaugeOpts{
+			Name:        "postgresql_instance_connected_backends",
+			Help:        "Current number of concurrent connections in all databases",
+			ConstLabels: g.labels,
+		},
+		"SELECT sum(numbackends) FROM pg_stat_database;",
+	)
+}
+
 type backendsByState struct {
 	Total float64 `db:"total"`
 	State string  `db:"state"`
