@@ -21,7 +21,7 @@ var (
 	configFile = flag.String("config", "config.yml", "The path to the config file.")
 	interval   = flag.Duration("interval", 30*time.Second, "interval between gathering metrics")
 	timeout    = flag.Duration("timeout", 15*time.Second, "query timeout")
-	maxDBConns = flag.Int("max-db-connections", 1, "max connections to open to each database")
+	maxDBConns = flag.Int("max-db-connections", 5, "max connections to open to each database")
 	debug      = flag.Bool("debug", false, "Enable debug mode")
 )
 
