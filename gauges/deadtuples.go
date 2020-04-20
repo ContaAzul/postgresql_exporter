@@ -41,7 +41,7 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 			for _, table := range tables {
 				var pct []float64
 				if err := g.queryWithTimeout(
-					"SELECT dead_tuple_percent FROM pgstattuple($1)",
+					"SELECT dead_tuple_percent FROM pgstattuple_approx($1)",
 					&pct,
 					[]interface{}{table.Name},
 					1*time.Minute,
@@ -57,8 +57,8 @@ func (g *Gauges) DeadTuples() *prometheus.GaugeVec {
 }
 
 func (g *Gauges) hasPermissionToExecutePgStatTuple() bool {
-	if _, err := g.db.Exec("SELECT 1 FROM pgstattuple('pg_class')"); err != nil {
-		log.WithField("db", g.name).WithError(err).Error("failed to execute pgstattuple function")
+	if _, err := g.db.Exec("SELECT 1 FROM pgstattuple_approx('pg_class')"); err != nil {
+		log.WithField("db", g.name).WithError(err).Error("failed to execute pgstattuple_approx function")
 		return false
 	}
 	return true
