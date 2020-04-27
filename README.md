@@ -55,6 +55,31 @@ CREATE OR REPLACE FUNCTION monitoring.pgstattuple(IN relname text,
   FROM public.pgstattuple(relname)
 $$ LANGUAGE SQL VOLATILE SECURITY DEFINER;
 
+CREATE OR REPLACE FUNCTION monitoring.pgstattuple_approx(IN relname text,
+    OUT table_len            BIGINT,
+    OUT scanned_percent 	 FLOAT8,
+    OUT approx_tuple_count 	 BIGINT,
+    OUT approx_tuple_len 	 BIGINT,
+    OUT approx_tuple_percent FLOAT8,
+    OUT dead_tuple_count 	 BIGINT,
+    OUT dead_tuple_len 	     BIGINT,
+    OUT dead_tuple_percent 	 FLOAT8,
+    OUT approx_free_space 	 BIGINT,
+    OUT approx_free_percent  FLOAT8) AS $$
+  SELECT
+    table_len,
+    scanned_percent,
+    approx_tuple_count,
+    approx_tuple_len,
+    approx_tuple_percent,
+    dead_tuple_count,
+    dead_tuple_len,
+    dead_tuple_percent,
+    approx_free_space,
+    approx_free_percent
+  FROM public.pgstattuple_approx(relname)
+$$ LANGUAGE SQL VOLATILE SECURITY DEFINER;
+
 CREATE ROLE monitoring WITH LOGIN PASSWORD 'mypassword' 
   CONNECTION LIMIT 5 IN ROLE pg_monitor;
 ALTER ROLE monitoring SET search_path = monitoring, pg_catalog, public;
@@ -66,7 +91,7 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA monitoring TO monitoring;
 
 Note that these statements must be run as a superuser (to create the SECURITY DEFINER function), but from here onwards you can use the `monitoring` user instead. The exporter will automatically use the helper methods if they exist in the `monitoring` schema, otherwise data will be fetched directly.
 
-The default role `pg_monitor` was only added in PostgreSQL 10 (See more details [here](https://www.postgresql.org/docs/10/static/default-roles.html)). If you're running Postgres 9.6 or lower you need to create some other helper methods in the `monitoring` schema:
+The default role `pg_monitor` only has in PostgreSQL 10 or later (See more details [here](https://www.postgresql.org/docs/10/static/default-roles.html)). If you're running Postgres 9.6 or lower you need to create some other helper methods in the `monitoring` schema:
 
 ```sql
 CREATE OR REPLACE FUNCTION monitoring.pg_stat_activity() RETURNS SETOF pg_stat_activity AS $$
