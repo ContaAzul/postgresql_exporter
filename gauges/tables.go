@@ -143,6 +143,7 @@ func (g *Gauges) TableBloat() *prometheus.GaugeVec {
 	)
 	go func() {
 		for {
+			gauge.Reset()
 			var tables []tableBloat
 			if err := g.query(tableBloatQuery, &tables, emptyParams); err == nil {
 				for _, table := range tables {
