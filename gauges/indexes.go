@@ -265,6 +265,7 @@ func (g *Gauges) IndexBloat() *prometheus.GaugeVec {
 	)
 	go func() {
 		for {
+			gauge.Reset()
 			var indexes []indexBloat
 			if err := g.query(indexBloatQuery, &indexes, emptyParams); err == nil {
 				for _, idx := range indexes {
