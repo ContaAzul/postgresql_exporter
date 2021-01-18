@@ -8,9 +8,17 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Sql struct {
+	ConnectionName   string `yaml:"conection_name,omitempty"`
+	DatabaseName     string `yaml:"database_name,omitempty"`
+	DatabaseUser     string `yaml:"database_user,omitempty"`
+	DatabasePassword string `yaml:"database_password,omitempty"`
+}
+
 type Database struct {
 	URL  string `yaml:"url,omitempty"`
 	Name string `yaml:"name,omitempty"`
+	Sql  Sql    `yaml:"sql,omitempty"`
 }
 
 type Config struct {
@@ -38,8 +46,8 @@ func validate(config Config) error {
 		if conf.Name == "" {
 			return errors.New("failed to validate configuration. Database name cannot be empty")
 		}
-		if conf.URL == "" {
-			return fmt.Errorf("failed to validate configuration. URL for database '%s' cannot be empty", conf.Name)
+		if conf.URL == "" && conf.Sql.ConnectionName == "" {
+			return fmt.Errorf("failed to validate configuration. URL or sql field cannot be empty in the '%s' database", conf.Name)
 		}
 		if names[conf.Name] {
 			return fmt.Errorf("failed to validate configuration. A database named '%s' has already been declared", conf.Name)

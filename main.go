@@ -3,11 +3,13 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/ContaAzul/postgresql_exporter/config"
 	"github.com/ContaAzul/postgresql_exporter/gauges"
+	_ "github.com/GoogleCloudPlatform/cloudsql-proxy/proxy/dialers/postgres"
 	"github.com/apex/httplog"
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/logfmt"
@@ -58,9 +60,25 @@ func main() {
 	for _, con := range config.Databases {
 		var log = log.WithField("db", con.Name)
 		log.Info("started monitoring")
-		db, err := sql.Open("postgres", con.URL)
-		if err != nil {
-			log.WithError(err).Error("failed to open url")
+		var db *sql.DB
+
+		if con.Sql.ConnectionName != "" {
+			log.Info(fmt.Sprintf("Using sqlproxy with connection name: %s", con.Sql.ConnectionName))
+			dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
+				con.Sql.ConnectionName,
+				con.Sql.DatabaseUser,
+				con.Sql.DatabasePassword,
+				con.Sql.DatabaseName)
+
+			db, err = sql.Open("cloudsqlpostgres", dsn)
+			if err != nil {
+				log.WithError(err).Error("failed to open url")
+			}
+		} else {
+			db, err = sql.Open("postgres", con.URL)
+			if err != nil {
+				log.WithError(err).Error("failed to open url")
+			}
 		}
 		if err := db.Ping(); err != nil {
 			log.WithError(err).Error("failed to ping database")

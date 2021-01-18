@@ -3,3 +3,11 @@ databases:
   url: postgres://localhost:5432/dba?sslmode=disable
 - name: dbb
   url: postgres://user:pwd@mydb.foo.bar:5432/dbb
+- name: dbc
+  # Used to connect into gcp sql instance using sqlproxy, when defined the URL is not necessary.
+  # https://cloud.google.com/sql/docs/postgres/connect-admin-proxy#go
+  sql:
+    conection_name: gcp-project:region:instance-name
+    database_name: dbc
+    database_user: user
+    database_password: pwd
