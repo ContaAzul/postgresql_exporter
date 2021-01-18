@@ -7,7 +7,7 @@ databases:
   # Used to connect into gcp sql instance using sqlproxy, when defined the URL is not necessary.
   # https://cloud.google.com/sql/docs/postgres/connect-admin-proxy#go
   sql:
-    conection_name: gcp-project:region:instance-name
+    connection_name: gcp-project:region:instance-name
     database_name: dbc
     database_user: user
     database_password: pwd

@@ -9,7 +9,7 @@ import (
 )
 
 type Sql struct {
-	ConnectionName   string `yaml:"conection_name,omitempty"`
+	ConnectionName   string `yaml:"connection_name,omitempty"`
 	DatabaseName     string `yaml:"database_name,omitempty"`
 	DatabaseUser     string `yaml:"database_user,omitempty"`
 	DatabasePassword string `yaml:"database_password,omitempty"`
