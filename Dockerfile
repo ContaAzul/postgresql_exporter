@@ -1,7 +1,7 @@
 FROM golang:alpine as build
 RUN apk --no-cache add ca-certificates make
 WORKDIR /go/src/app
-COPY . .
+COPY . /go/src/app
 RUN make build
 
 FROM scratch
