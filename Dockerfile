@@ -1,8 +1,7 @@
 FROM golang:alpine as build
 RUN apk --no-cache add ca-certificates make
 WORKDIR /go/src/app
-COPY . /go/src/app
-RUN make build
+COPY . .
 
 FROM scratch
 EXPOSE 9111
