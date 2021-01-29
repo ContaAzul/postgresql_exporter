@@ -50,3 +50,26 @@ func TestIsEqualOrGreaterThan10(t *testing.T) {
 		})
 	}
 }
+
+func TestIsEqualOrGreaterThan13(t *testing.T) {
+	tt := []struct {
+		version  int
+		expected bool
+	}{
+		{90407, false},
+		{90600, false},
+		{90606, false},
+		{100000, false},
+		{100004, false},
+		{110000, false},
+		{110004, false},
+		{130000, true},
+	}
+
+	for _, tc := range tt {
+		testName := fmt.Sprintf("expecting IsEqualOrGreaterThan13(\"%v\") to be %v", tc.version, tc.expected)
+		t.Run(testName, func(t *testing.T) {
+			assert.Equal(t, Version(tc.version).IsEqualOrGreaterThan13(), tc.expected)
+		})
+	}
+}
