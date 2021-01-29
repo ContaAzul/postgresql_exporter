@@ -63,8 +63,8 @@ func (v Version) CurrentWalLsnFunctionName() string {
 	return "pg_current_xlog_location"
 }
 
-// PgStatStatementsTimeColum returns the name of the column that contains the total time spent executing the statement.
-func (v Version) PgStatStatementsTimeColumn() string {
+// PgStatStatementsTotalTimeColumn returns the name of the column that contains the total time spent executing the statement.
+func (v Version) PgStatStatementsTotalTimeColumn() string {
 	if v.IsEqualOrGreaterThan13() {
 		return "total_exec_time"
 	}

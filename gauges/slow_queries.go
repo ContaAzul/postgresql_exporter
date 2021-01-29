@@ -45,7 +45,7 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 						WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
 						ORDER BY %[1]s desc limit 10
 					`,
-					postgres.Version(g.version()).PgStatStatementsTimeColumn(),
+					postgres.Version(g.version()).PgStatStatementsTotalTimeColumn(),
 				),
 				&queries,
 				emptyParams,
