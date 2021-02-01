@@ -38,13 +38,11 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 		for {
 			var queries []slowQuery
 			if err := g.query(
-				fmt.Sprintf(
-					`
-						SELECT %[1]s as total_time, query
-						FROM pg_stat_statements
-						WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
-						ORDER BY %[1]s desc limit 10
-					`,
+				fmt.Sprintf(`
+					SELECT %[1]s as total_time, query
+					FROM pg_stat_statements
+					WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
+					ORDER BY %[1]s desc limit 10`,
 					postgres.Version(g.version()).PgStatStatementsTotalTimeColumn(),
 				),
 				&queries,
