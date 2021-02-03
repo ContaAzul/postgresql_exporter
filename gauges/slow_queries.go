@@ -1,19 +1,14 @@
 package gauges
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
+	"github.com/ContaAzul/postgresql_exporter/postgres"
 	"github.com/apex/log"
 	"github.com/prometheus/client_golang/prometheus"
 )
-
-const slowQueriesQuery = `
-	SELECT total_time, query
-	FROM pg_stat_statements
-	WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
-	ORDER BY total_time desc limit 10
-`
 
 type slowQuery struct {
 	Query string  `db:"query"`
@@ -42,7 +37,17 @@ func (g *Gauges) SlowestQueries() *prometheus.GaugeVec {
 	go func() {
 		for {
 			var queries []slowQuery
-			if err := g.query(slowQueriesQuery, &queries, emptyParams); err == nil {
+			if err := g.query(
+				fmt.Sprintf(`
+					SELECT %[1]s as total_time, query
+					FROM pg_stat_statements
+					WHERE dbid = (SELECT datid FROM pg_stat_database WHERE datname = current_database())
+					ORDER BY %[1]s desc limit 10`,
+					postgres.Version(g.version()).PgStatStatementsTotalTimeColumn(),
+				),
+				&queries,
+				emptyParams,
+			); err == nil {
 				for _, query := range queries {
 					gauge.With(prometheus.Labels{
 						"query": strings.Join(strings.Fields(query.Query), " "),

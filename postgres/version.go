@@ -13,6 +13,11 @@ func (v Version) IsEqualOrGreaterThan10() bool {
 	return v >= 100000
 }
 
+// IsEqualOrGreaterThan13 returns whether this version is greater than 13.0
+func (v Version) IsEqualOrGreaterThan13() bool {
+	return v >= 130000
+}
+
 // IsWalReplayPausedFunctionName returns the name of the function to verify whether the replication
 // log is paused according to the postgres version
 func (v Version) IsWalReplayPausedFunctionName() string {
@@ -49,11 +54,19 @@ func (v Version) LastWalReplayedLsnFunctionName() string {
 	return "pg_last_xlog_replay_location"
 }
 
-// CurrentWalLsnFunctionName returns the name of the function that gets current 
+// CurrentWalLsnFunctionName returns the name of the function that gets current
 // write-ahead log write location according to the postgres version
 func (v Version) CurrentWalLsnFunctionName() string {
 	if v.IsEqualOrGreaterThan10() {
 		return "pg_current_wal_lsn"
 	}
 	return "pg_current_xlog_location"
+}
+
+// PgStatStatementsTotalTimeColumn returns the name of the column that contains the total time spent executing the statement.
+func (v Version) PgStatStatementsTotalTimeColumn() string {
+	if v.IsEqualOrGreaterThan13() {
+		return "total_exec_time"
+	}
+	return "total_time"
 }
