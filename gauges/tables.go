@@ -118,7 +118,7 @@ WITH constants AS (
 	FROM table_estimates_plus
 	)
 	SELECT tablename,
-		COALESCE(pct_bloat,0)
+		COALESCE(pct_bloat,0) as pct_bloat
 	FROM bloat_data
 --	WHERE ( pct_bloat >= 30 AND mb_bloat >= 10 )
 --	OR ( pct_bloat >= 20 AND mb_bloat >= 1000 )

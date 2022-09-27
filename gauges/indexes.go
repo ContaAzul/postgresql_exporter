@@ -238,7 +238,7 @@ SELECT dbname as database_name, nspname as schema_name, table_name, index_name,
 	index_scans
 FROM raw_bloat
 )
-SELECT table_name, index_name, COALESCE(bloat_pct,0)
+SELECT table_name, index_name, COALESCE(bloat_pct,0) as bloat_pct
 FROM format_bloat
 WHERE database_name = current_database()
 --AND bloat_pct > 50
