@@ -238,11 +238,11 @@ SELECT dbname as database_name, nspname as schema_name, table_name, index_name,
 	index_scans
 FROM raw_bloat
 )
-SELECT table_name, index_name, bloat_pct
+SELECT table_name, index_name, COALESCE(bloat_pct,0)
 FROM format_bloat
 WHERE database_name = current_database()
-AND bloat_pct > 50
-AND bloat_mb > 10
+--AND bloat_pct > 50
+--AND bloat_mb > 10
 ORDER BY bloat_mb DESC
 `
 
