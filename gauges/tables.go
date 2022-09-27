@@ -118,10 +118,10 @@ WITH constants AS (
 	FROM table_estimates_plus
 	)
 	SELECT tablename,
-		pct_bloat
+		COALESCE(pct_bloat,0)
 	FROM bloat_data
-	WHERE ( pct_bloat >= 30 AND mb_bloat >= 10 )
-	OR ( pct_bloat >= 20 AND mb_bloat >= 1000 )
+--	WHERE ( pct_bloat >= 30 AND mb_bloat >= 10 )
+--	OR ( pct_bloat >= 20 AND mb_bloat >= 1000 )
 	ORDER BY pct_bloat DESC
 `
 
@@ -221,8 +221,8 @@ func (g *Gauges) TableUsage() *prometheus.GaugeVec {
 }
 
 var tableSecScansQuery = `
-	select relname, 
-		coalesce(seq_scan, 0) as seq_scan, 
+	select relname,
+		coalesce(seq_scan, 0) as seq_scan,
 		coalesce(idx_scan, 0) as idx_scan
 	from pg_stat_user_tables
 `
