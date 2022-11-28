@@ -1,3 +1,6 @@
+:warning: Deprecated - Use https://github.com/prometheus-community/postgres_exporter :warning:
+
+
 # postgresql_exporter
 
 A Prometheus exporter for some postgresql metrics.
